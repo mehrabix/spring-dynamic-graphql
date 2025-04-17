@@ -1012,6 +1012,91 @@ mutation {
 }
 ```
 
+#### Partial Updates
+
+Update only specific attributes of a product without changing other fields:
+
+```graphql
+mutation {
+  updateProductAttributes(
+    id: "1",
+    attributes: {
+      price: 999.99
+      inStock: true
+      stockQuantity: 25
+      rating: 4.8
+    }
+  ) {
+    id
+    name
+    price
+    inStock
+    stockQuantity
+    rating
+    updatedAt
+  }
+}
+```
+
+This is useful for updates where you only want to modify specific fields without affecting others. The server applies a patch-like update rather than a full replacement.
+
+#### Custom Attributes
+
+Products support custom attributes for storing key-value pairs that aren't part of the standard schema. These can be added and retrieved through the API:
+
+```graphql
+mutation {
+  addProduct(product: {
+    name: "Specialty Coffee Machine"
+    description: "Professional grade coffee maker"
+    price: 799.99
+    category: "Kitchen Appliances"
+    customAttributes: {
+      "powerConsumption": "1200W"
+      "waterCapacity": "2L"
+      "brewingTechnology": "Pressure Extraction"
+      "warranty": "3 years"
+    }
+  }) {
+    id
+    name
+    customAttributes
+  }
+}
+```
+
+When querying products, you can request these custom attributes:
+
+```graphql
+query {
+  productById(id: "5") {
+    id
+    name
+    price
+    customAttributes
+  }
+}
+```
+
+Or through the dynamic query interface:
+
+```graphql
+query {
+  dynamicProductQuery(
+    attributes: ["name", "price", "powerConsumption", "brewingTechnology"]
+    filter: {
+      categories: ["Kitchen Appliances"]
+    }
+  ) {
+    id
+    attributes {
+      name
+      value
+    }
+  }
+}
+```
+
 ### Delete Operations
 
 #### Delete a Single Product
@@ -1749,3 +1834,88 @@ These advanced reporting features can be implemented using the existing architec
 - Leveraging JPA for simple aggregations and native SQL for complex aggregations
 - Adding scheduled tasks for report generation
 - Implementing export services for different file formats 
+
+## GraphQL Subscriptions
+
+The application supports real-time data updates through GraphQL Subscriptions. These can be tested using GraphiQL's subscription support.
+
+### Product Updated Subscription
+
+Subscribe to real-time updates whenever a product is updated:
+
+```graphql
+subscription {
+  productUpdated {
+    id
+    name
+    price
+    updatedAt
+  }
+}
+```
+
+### Price Change Notifications
+
+Get notified when product prices change beyond a specified threshold:
+
+```graphql
+subscription {
+  productPriceChanged(minPriceDifference: 10.0) {
+    product {
+      id
+      name
+    }
+    oldPrice
+    newPrice
+    percentChange
+  }
+}
+```
+
+### Low Stock Alerts
+
+Receive alerts when products are running low on stock:
+
+```graphql
+subscription {
+  lowStockAlert(threshold: 5) {
+    id
+    name
+    stockQuantity
+    category
+  }
+}
+```
+
+## Tag Operations
+
+The application provides specialized operations for working with product tags.
+
+### Add a Tag to a Product
+
+```graphql
+mutation {
+  addProductTag(
+    id: "1", 
+    tag: "limited-edition"
+  ) {
+    id
+    name
+    tags
+  }
+}
+```
+
+### Remove a Tag from a Product
+
+```graphql
+mutation {
+  removeProductTag(
+    id: "1",
+    tag: "limited-edition"
+  ) {
+    id
+    name
+    tags
+  }
+} 
