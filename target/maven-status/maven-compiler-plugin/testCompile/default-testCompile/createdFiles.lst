@@ -1,0 +1,3 @@
+com\example\graphql\dto\ProductFilterTest.class
+com\example\graphql\service\DynamicQueryServiceTest.class
+com\example\graphql\repository\ProductSpecificationTest.class
