@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.example.graphql.dto.DynamicProductTest" time="0.013" tests="3" errors="0" skipped="0" failures="0">
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.example.graphql.controller.ProductControllerTest" time="2.217" tests="9" errors="0" skipped="0" failures="0">
   <properties>
     <property name="java.specification.version" value="23"/>
     <property name="sun.cpu.isalist" value="amd64"/>
@@ -61,7 +61,46 @@
     <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
     <property name="java.class.version" value="67.0"/>
   </properties>
-  <testcase name="testEmptyConstructor" classname="com.example.graphql.dto.DynamicProductTest" time="0.003"/>
-  <testcase name="testConstructorAndGetters" classname="com.example.graphql.dto.DynamicProductTest" time="0.004"/>
-  <testcase name="testSetters" classname="com.example.graphql.dto.DynamicProductTest" time="0.001"/>
+  <testcase name="testAllProducts" classname="com.example.graphql.controller.ProductControllerTest" time="1.952">
+    <system-out><![CDATA[12:01:38.483 [main] INFO com.example.graphql.controller.ProductController -- Fetching all products
+12:01:38.490 [main] INFO com.example.graphql.controller.ProductController -- Found 1 products
+]]></system-out>
+    <system-err><![CDATA[WARNING: A Java agent has been loaded dynamically (C:\Users\Ahmad\.m2\repository\net\bytebuddy\byte-buddy-agent\1.14.10\byte-buddy-agent-1.14.10.jar)
+WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+WARNING: Dynamic loading of agents will be disallowed by default in a future release
+]]></system-err>
+  </testcase>
+  <testcase name="testUpdateProduct" classname="com.example.graphql.controller.ProductControllerTest" time="0.027">
+    <system-out><![CDATA[12:01:38.553 [main] INFO com.example.graphql.controller.ProductController -- Updating product with ID: 1
+]]></system-out>
+  </testcase>
+  <testcase name="testProductsWithFilter" classname="com.example.graphql.controller.ProductControllerTest" time="0.01">
+    <system-out><![CDATA[12:01:38.573 [main] INFO com.example.graphql.controller.ProductController -- Executing advanced product query with filters
+]]></system-out>
+  </testcase>
+  <testcase name="testAddProduct" classname="com.example.graphql.controller.ProductControllerTest" time="0.007">
+    <system-out><![CDATA[12:01:38.585 [main] INFO com.example.graphql.controller.ProductController -- Adding new product: Test Product
+]]></system-out>
+  </testcase>
+  <testcase name="testDeleteProduct" classname="com.example.graphql.controller.ProductControllerTest" time="0.02">
+    <system-out><![CDATA[12:01:38.606 [main] INFO com.example.graphql.controller.ProductController -- Deleting product with ID: 1
+]]></system-out>
+  </testcase>
+  <testcase name="testProductsByCategory" classname="com.example.graphql.controller.ProductControllerTest" time="0.052">
+    <system-out><![CDATA[12:01:38.659 [main] INFO com.example.graphql.controller.ProductController -- Fetching products with category: Test Category
+]]></system-out>
+  </testcase>
+  <testcase name="testBulkAddProducts" classname="com.example.graphql.controller.ProductControllerTest" time="0.006">
+    <system-out><![CDATA[12:01:38.689 [main] INFO com.example.graphql.controller.ProductController -- Adding 1 products in bulk
+]]></system-out>
+  </testcase>
+  <testcase name="testBulkDeleteProducts" classname="com.example.graphql.controller.ProductControllerTest" time="0.011">
+    <system-out><![CDATA[12:01:38.698 [main] INFO com.example.graphql.controller.ProductController -- Deleting 1 products in bulk
+]]></system-out>
+  </testcase>
+  <testcase name="testProductById" classname="com.example.graphql.controller.ProductControllerTest" time="0.015">
+    <system-out><![CDATA[12:01:38.718 [main] INFO com.example.graphql.controller.ProductController -- Fetching product with ID: 1
+]]></system-out>
+  </testcase>
 </testsuite>

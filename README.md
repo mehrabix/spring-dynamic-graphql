@@ -104,6 +104,8 @@ query {
     inStock
     rating
     tags
+    stockQuantity
+    popularity
     createdAt
     updatedAt
   }
@@ -121,8 +123,12 @@ query {
     name
     description
     price
+    category
+    inStock
     rating
     tags
+    stockQuantity
+    popularity
   }
 }
 ```
@@ -138,6 +144,8 @@ query {
     name
     price
     category
+    inStock
+    stockQuantity
   }
 }
 ```
@@ -152,16 +160,18 @@ Find products containing specific text in their name:
 query {
   productsWithFilter(
     filter: {
-      nameContains: "pro"
+      nameContains: "phone"
     }
   ) {
     content {
+      id
       name
       price
       category
     }
     pageInfo {
       totalElements
+      totalPages
     }
   }
 }
@@ -184,6 +194,9 @@ query {
       price
       category
     }
+    pageInfo {
+      totalElements
+    }
   }
 }
 ```
@@ -204,6 +217,9 @@ query {
       category
       price
     }
+    pageInfo {
+      totalElements
+    }
   }
 }
 ```
@@ -221,6 +237,7 @@ query {
   ) {
     content {
       name
+      inStock
       stockQuantity
       price
     }
@@ -256,7 +273,7 @@ Find products with specific tags:
 query {
   productsWithFilter(
     filter: {
-      hasTags: ["wireless", "bluetooth", "premium"]
+      hasTags: ["premium", "wireless", "bluetooth"]
     }
   ) {
     content {
@@ -302,6 +319,7 @@ query {
     content {
       name
       createdAt
+      price
     }
   }
 }
@@ -321,6 +339,7 @@ query {
     content {
       name
       stockQuantity
+      inStock
     }
   }
 }
@@ -334,12 +353,13 @@ Find products with a minimum popularity rating:
 query {
   productsWithFilter(
     filter: {
-      minPopularity: 70
+      minPopularity: 75
     }
   ) {
     content {
       name
       popularity
+      price
     }
   }
 }
@@ -354,11 +374,11 @@ query {
   productsWithFilter(
     filter: {
       categories: ["Electronics", "Computers"]
-      minPrice: 500
-      maxPrice: 2000
+      minPrice: 200
+      maxPrice: 1000
       minRating: 4.0
-      hasTags: ["laptop", "gaming"]
-      minStockQuantity: 3
+      hasTags: ["premium", "wireless"]
+      minStockQuantity: 5
       inStock: true
       minPopularity: 50
       nameContains: "pro"
@@ -373,9 +393,13 @@ query {
       tags
       stockQuantity
       popularity
+      inStock
     }
     pageInfo {
       totalElements
+      totalPages
+      currentPage
+      hasNext
     }
   }
 }
@@ -399,6 +423,7 @@ query {
     content {
       name
       price
+      category
     }
   }
 }
@@ -420,6 +445,7 @@ query {
     content {
       name
       price
+      category
     }
   }
 }
@@ -456,6 +482,7 @@ query {
     content {
       name
       rating
+      price
     }
   }
 }
@@ -474,6 +501,7 @@ query {
     content {
       name
       createdAt
+      price
     }
   }
 }
@@ -492,6 +520,7 @@ query {
     content {
       name
       popularity
+      price
     }
   }
 }
@@ -510,6 +539,7 @@ query {
     content {
       name
       stockQuantity
+      inStock
     }
   }
 }
@@ -616,6 +646,7 @@ query {
   ) {
     content {
       name
+      price
     }
     pageInfo {
       size
@@ -742,7 +773,7 @@ Request specific attributes from products:
 ```graphql
 query {
   dynamicProductQuery(
-    attributes: ["name", "price", "category"]
+    attributes: ["id", "name", "price", "category"]
   ) {
     id
     attributes {
@@ -785,6 +816,7 @@ query {
     attributes: ["name", "category", "stockStatus", "priceWithTax", "relatedProductCount"]
     filter: {
       minRating: 4.0
+      inStock: true
     }
   ) {
     id
@@ -796,13 +828,36 @@ query {
 }
 ```
 
-### All Available Product Attributes
+## Relationship Queries
 
-Request all available attributes:
+### Related Products
+
+Find products related to a specific product:
 
 ```graphql
 query {
-  availableProductAttributes
+  relatedProducts(id: 1, maxResults: 5) {
+    id
+    name
+    price
+    category
+    rating
+  }
+}
+```
+
+### Frequently Bought Together
+
+Find products frequently bought together with a specific product:
+
+```graphql
+query {
+  frequentlyBoughtTogether(id: 1, maxResults: 3) {
+    id
+    name
+    price
+    category
+  }
 }
 ```
 
@@ -817,26 +872,27 @@ Basic product creation:
 ```graphql
 mutation {
   addProduct(product: {
-    name: "Gaming Mouse"
-    description: "High-precision gaming mouse with customizable buttons"
-    price: 79.99
-    category: "Gaming"
+    name: "Ultra HD Gaming Monitor"
+    description: "32-inch curved gaming monitor with 144Hz refresh rate"
+    price: 449.99
+    category: "Electronics"
     inStock: true
-    rating: 4.2
-    tags: ["gaming", "mouse", "rgb"]
-    stockQuantity: 25
+    rating: 4.7
+    tags: ["gaming", "monitor", "ultra-hd", "curved"]
+    stockQuantity: 15
     popularity: 85
   }) {
     id
     name
-    tags
+    price
+    category
   }
 }
 ```
 
-#### Add a Product with All Fields
+#### Add a Product with Custom Attributes
 
-Complete product creation with all available fields:
+Complete product creation with custom attributes:
 
 ```graphql
 mutation {
@@ -876,37 +932,24 @@ Add multiple products at once:
 mutation {
   bulkAddProducts(products: [
     {
-      name: "Wireless Mouse"
-      description: "Comfortable wireless mouse with long battery life"
-      price: 49.99
+      name: "Wireless Keyboard"
+      description: "Ergonomic wireless keyboard with backlight"
+      price: 59.99
       category: "Computers"
       inStock: true
-      rating: 4.0
-      tags: ["mouse", "wireless", "computer"]
+      rating: 4.2
+      tags: ["keyboard", "wireless", "ergonomic"]
+      stockQuantity: 25
+    },
+    {
+      name: "Bluetooth Speaker"
+      description: "Portable Bluetooth speaker with 20h battery life"
+      price: 89.99
+      category: "Audio"
+      inStock: true
+      rating: 4.5
+      tags: ["speaker", "bluetooth", "portable"]
       stockQuantity: 30
-      popularity: 75
-    },
-    {
-      name: "Mechanical Keyboard"
-      description: "Tactile mechanical keyboard with customizable switches"
-      price: 129.99
-      category: "Computers"
-      inStock: true
-      rating: 4.3
-      tags: ["keyboard", "mechanical", "typing"]
-      stockQuantity: 20
-      popularity: 80
-    },
-    {
-      name: "Ultra-wide Monitor"
-      description: "34-inch curved ultra-wide monitor for immersive experience"
-      price: 449.99
-      category: "Computers"
-      inStock: true
-      rating: 4.6
-      tags: ["monitor", "ultra-wide", "curved", "gaming"]
-      stockQuantity: 15
-      popularity: 85
     }
   ]) {
     id
@@ -940,6 +983,7 @@ mutation {
     price
     description
     tags
+    updatedAt
   }
 }
 ```
@@ -968,45 +1012,6 @@ mutation {
 }
 ```
 
-#### Update Product Tags
-
-Add or remove tags from a product:
-
-```graphql
-mutation {
-  updateProductTags(
-    id: "3",
-    addTags: ["bestseller", "popular"],
-    removeTags: ["outdated"]
-  ) {
-    id
-    name
-    tags
-  }
-}
-```
-
-#### Update Product Custom Attributes
-
-Update custom attributes for a product:
-
-```graphql
-mutation {
-  updateProductAttributes(
-    id: "4",
-    attributes: {
-      "color": "Midnight Black"
-      "material": "Aircraft-grade aluminum"
-      "warranty": "2 years"
-    }
-  ) {
-    id
-    name
-    customAttributes
-  }
-}
-```
-
 ### Delete Operations
 
 #### Delete a Single Product
@@ -1024,58 +1029,6 @@ Delete multiple products at once:
 ```graphql
 mutation {
   bulkDeleteProducts(ids: ["5", "6", "7"])
-}
-```
-
-#### Delete Products by Category
-
-Delete all products in a specific category:
-
-```graphql
-mutation {
-  deleteProductsByCategory(category: "Outdated")
-}
-```
-
-### Product Relationship Operations
-
-#### Add Related Products
-
-Create relationships between products:
-
-```graphql
-mutation {
-  addRelatedProducts(
-    productId: "1",
-    relatedProductIds: ["2", "3", "4"]
-  ) {
-    id
-    name
-    relatedProducts {
-      id
-      name
-    }
-  }
-}
-```
-
-#### Add Frequently Bought Together Products
-
-Specify products that are frequently bought together:
-
-```graphql
-mutation {
-  addFrequentlyBoughtTogether(
-    productId: "1",
-    frequentlyBoughtWithIds: ["5", "8"]
-  ) {
-    id
-    name
-    frequentlyBoughtWith {
-      id
-      name
-    }
-  }
 }
 ```
 

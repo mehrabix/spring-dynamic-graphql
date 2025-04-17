@@ -1,4 +1,5 @@
 com\example\graphql\dto\ProductFilterTest.class
+com\example\graphql\controller\ProductControllerTest.class
 com\example\graphql\dto\ProductAttributeTest.class
 com\example\graphql\repository\ProductSpecificationTest.class
 com\example\graphql\service\ProductStatsServiceTest.class

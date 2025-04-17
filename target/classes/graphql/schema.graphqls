@@ -18,6 +18,14 @@ type Query {
     # Product relationships and graph traversal
     relatedProducts(id: ID!, maxResults: Int = 5): [Product]
     frequentlyBoughtTogether(id: ID!, maxResults: Int = 3): [Product]
+    
+    # Reporting queries
+    salesReportByTimeframe(
+        timeframe: TimeframeType = MONTHLY,
+        startDate: String,
+        endDate: String,
+        filter: ProductFilter
+    ): [SalesReportPeriod!]!
 }
 
 type Mutation {
@@ -202,4 +210,29 @@ type PageInfo {
     size: Int!
     hasNext: Boolean!
     hasPrevious: Boolean!
+}
+
+# Reporting Types
+enum TimeframeType {
+    DAILY
+    WEEKLY
+    MONTHLY
+    QUARTERLY
+    YEARLY
+    CUSTOM
+}
+
+type SalesReportPeriod {
+    period: String!
+    totalSales: Int!
+    totalRevenue: Float!
+    averageOrderValue: Float!
+    topSellingProducts: [TopSellingProduct!]!
+}
+
+type TopSellingProduct {
+    productId: ID!
+    productName: String!
+    unitsSold: Int!
+    revenue: Float!
 } 
