@@ -35,6 +35,8 @@ The application will start on port 8080 by default.
 - Advanced filtering, sorting, and pagination
 - In-memory H2 database with comprehensive demo data
 - GraphiQL interface for testing GraphQL queries
+- Dynamic querying capabilities
+- Statistical analysis of product data
 
 ## Accessing the Application
 
@@ -83,22 +85,77 @@ The filtering system is implemented using Spring Data JPA Specifications. When a
 - **Date Filtering**: `createdAfter/createdBefore` use SQL date comparison operations
 - **Numeric Filtering**: `minStockQuantity` and `minPopularity` use `>=` comparison
 
-### Sample Filter Queries
+## Sample GraphQL Queries
 
-#### Basic Price and Category Filtering
+### Basic Queries
+
+#### Get All Products
+
+Retrieve all products with their basic details:
+
+```graphql
+query {
+  allProducts {
+    id
+    name
+    description
+    price
+    category
+    inStock
+    rating
+    tags
+    createdAt
+    updatedAt
+  }
+}
+```
+
+#### Get Product by ID
+
+Fetch a specific product using its ID:
+
+```graphql
+query {
+  productById(id: "1") {
+    id
+    name
+    description
+    price
+    rating
+    tags
+  }
+}
+```
+
+#### Get Products by Category
+
+Retrieve all products in a specific category:
+
+```graphql
+query {
+  productsByCategory(category: "Electronics") {
+    id
+    name
+    price
+    category
+  }
+}
+```
+
+### Filtering Examples
+
+#### Text Filtering with nameContains
+
+Find products containing specific text in their name:
 
 ```graphql
 query {
   productsWithFilter(
     filter: {
-      minPrice: 100
-      maxPrice: 500
-      categories: ["Electronics", "Mobile Phones"]
-      inStock: true
+      nameContains: "pro"
     }
   ) {
     content {
-      id
       name
       price
       category
@@ -110,48 +167,129 @@ query {
 }
 ```
 
-#### Advanced Text and Tag Filtering
+#### Price Range Filtering
+
+Find products within a specific price range:
 
 ```graphql
 query {
   productsWithFilter(
     filter: {
-      nameContains: "pro"
-      hasTags: ["wireless", "premium"]
-      minRating: 4.0
+      minPrice: 100
+      maxPrice: 500
     }
   ) {
     content {
       name
       price
-      tags
-      rating
+      category
     }
   }
 }
 ```
 
-#### Stock and Popularity Filtering
+#### Category Filtering
+
+Find products in specific categories:
 
 ```graphql
 query {
   productsWithFilter(
     filter: {
-      minStockQuantity: 5
-      minPopularity: 50
+      categories: ["Electronics", "Mobile Phones", "Computers"]
+    }
+  ) {
+    content {
+      name
+      category
+      price
+    }
+  }
+}
+```
+
+#### In-Stock Filtering
+
+Find only products that are in stock:
+
+```graphql
+query {
+  productsWithFilter(
+    filter: {
       inStock: true
     }
   ) {
     content {
       name
       stockQuantity
-      popularity
+      price
     }
   }
 }
 ```
 
-#### Date-based Filtering
+#### Rating Filtering
+
+Find products with a minimum rating:
+
+```graphql
+query {
+  productsWithFilter(
+    filter: {
+      minRating: 4.5
+    }
+  ) {
+    content {
+      name
+      rating
+      price
+    }
+  }
+}
+```
+
+#### Tag Filtering
+
+Find products with specific tags:
+
+```graphql
+query {
+  productsWithFilter(
+    filter: {
+      hasTags: ["wireless", "bluetooth", "premium"]
+    }
+  ) {
+    content {
+      name
+      tags
+      price
+    }
+  }
+}
+```
+
+#### Price Change Filtering
+
+Find products that have had a price change:
+
+```graphql
+query {
+  productsWithFilter(
+    filter: {
+      hasPriceChanged: true
+    }
+  ) {
+    content {
+      name
+      price
+    }
+  }
+}
+```
+
+#### Date Filtering
+
+Find products created within a specific date range:
 
 ```graphql
 query {
@@ -169,7 +307,47 @@ query {
 }
 ```
 
-#### Complex Multi-criteria Filtering
+#### Stock Quantity Filtering
+
+Find products with a minimum stock quantity:
+
+```graphql
+query {
+  productsWithFilter(
+    filter: {
+      minStockQuantity: 10
+    }
+  ) {
+    content {
+      name
+      stockQuantity
+    }
+  }
+}
+```
+
+#### Popularity Filtering
+
+Find products with a minimum popularity rating:
+
+```graphql
+query {
+  productsWithFilter(
+    filter: {
+      minPopularity: 70
+    }
+  ) {
+    content {
+      name
+      popularity
+    }
+  }
+}
+```
+
+### Combining Multiple Filters
+
+You can combine any number of filter criteria for complex queries:
 
 ```graphql
 query {
@@ -182,6 +360,197 @@ query {
       hasTags: ["laptop", "gaming"]
       minStockQuantity: 3
       inStock: true
+      minPopularity: 50
+      nameContains: "pro"
+    }
+  ) {
+    content {
+      id
+      name
+      price
+      category
+      rating
+      tags
+      stockQuantity
+      popularity
+    }
+    pageInfo {
+      totalElements
+    }
+  }
+}
+```
+
+### Sorting Options
+
+#### Sort by Price (Ascending)
+
+```graphql
+query {
+  productsWithFilter(
+    filter: {
+      categories: ["Electronics"]
+    }
+    sort: {
+      field: PRICE
+      direction: ASC
+    }
+  ) {
+    content {
+      name
+      price
+    }
+  }
+}
+```
+
+#### Sort by Price (Descending)
+
+```graphql
+query {
+  productsWithFilter(
+    filter: {
+      categories: ["Electronics"]
+    }
+    sort: {
+      field: PRICE
+      direction: DESC
+    }
+  ) {
+    content {
+      name
+      price
+    }
+  }
+}
+```
+
+#### Sort by Name
+
+```graphql
+query {
+  productsWithFilter(
+    sort: {
+      field: NAME
+      direction: ASC
+    }
+  ) {
+    content {
+      name
+      price
+    }
+  }
+}
+```
+
+#### Sort by Rating
+
+```graphql
+query {
+  productsWithFilter(
+    sort: {
+      field: RATING
+      direction: DESC
+    }
+  ) {
+    content {
+      name
+      rating
+    }
+  }
+}
+```
+
+#### Sort by Creation Date
+
+```graphql
+query {
+  productsWithFilter(
+    sort: {
+      field: CREATED_AT
+      direction: DESC
+    }
+  ) {
+    content {
+      name
+      createdAt
+    }
+  }
+}
+```
+
+#### Sort by Popularity
+
+```graphql
+query {
+  productsWithFilter(
+    sort: {
+      field: POPULARITY
+      direction: DESC
+    }
+  ) {
+    content {
+      name
+      popularity
+    }
+  }
+}
+```
+
+#### Sort by Stock Quantity
+
+```graphql
+query {
+  productsWithFilter(
+    sort: {
+      field: STOCK_QUANTITY
+      direction: DESC
+    }
+  ) {
+    content {
+      name
+      stockQuantity
+    }
+  }
+}
+```
+
+### Pagination Examples
+
+#### Basic Pagination
+
+```graphql
+query {
+  productsWithFilter(
+    page: {
+      page: 0
+      size: 5
+    }
+  ) {
+    content {
+      name
+      price
+    }
+    pageInfo {
+      totalElements
+      totalPages
+      currentPage
+      size
+      hasNext
+      hasPrevious
+    }
+  }
+}
+```
+
+#### Pagination with Filtering and Sorting
+
+```graphql
+query {
+  productsWithFilter(
+    filter: {
+      minPrice: 100
+      categories: ["Electronics"]
     }
     sort: {
       field: PRICE
@@ -193,26 +562,114 @@ query {
     }
   ) {
     content {
-      id
       name
       price
       category
-      rating
-      tags
-      stockQuantity
     }
     pageInfo {
       totalElements
       totalPages
       currentPage
+      size
+      hasNext
+      hasPrevious
     }
   }
 }
 ```
 
-## Product Statistics with Filters
+#### Second Page of Results
 
-The API also supports generating product statistics based on filter criteria:
+```graphql
+query {
+  productsWithFilter(
+    filter: {
+      categories: ["Electronics"]
+    }
+    page: {
+      page: 1
+      size: 5
+    }
+  ) {
+    content {
+      name
+      price
+    }
+    pageInfo {
+      currentPage
+      hasNext
+      hasPrevious
+    }
+  }
+}
+```
+
+#### Custom Page Size
+
+```graphql
+query {
+  productsWithFilter(
+    page: {
+      page: 0
+      size: 20
+    }
+  ) {
+    content {
+      name
+    }
+    pageInfo {
+      size
+      totalElements
+      totalPages
+    }
+  }
+}
+```
+
+## Product Statistics
+
+### Basic Statistics
+
+Get basic statistics for all products:
+
+```graphql
+query {
+  productStats {
+    count
+    avgPrice
+    minPrice
+    maxPrice
+    inStockCount
+    outOfStockCount
+  }
+}
+```
+
+### Statistics with Category Distribution
+
+Get statistics with category distribution:
+
+```graphql
+query {
+  productStats {
+    count
+    avgPrice
+    minPrice
+    maxPrice
+    inStockCount
+    outOfStockCount
+    categoryDistribution {
+      category
+      count
+      percentage
+    }
+  }
+}
+```
+
+### Filtered Statistics
+
+Get statistics for products matching specific filters:
 
 ```graphql
 query {
@@ -237,9 +694,68 @@ query {
 }
 ```
 
+### Price Range Distribution
+
+Get statistics on price range distribution:
+
+```graphql
+query {
+  productStatsByFilter(
+    filter: {
+      categories: ["Electronics"]
+    }
+  ) {
+    count
+    avgPrice
+    priceRangeDistribution {
+      range
+      count
+      percentage
+    }
+  }
+}
+```
+
+### Rating Distribution
+
+Get statistics on rating distribution:
+
+```graphql
+query {
+  productStatsByFilter {
+    count
+    ratingDistribution {
+      rating
+      count
+      percentage
+    }
+  }
+}
+```
+
 ## Dynamic Product Queries
 
-The `dynamicProductQuery` allows requesting specific attributes from products with filtering:
+### Basic Dynamic Query
+
+Request specific attributes from products:
+
+```graphql
+query {
+  dynamicProductQuery(
+    attributes: ["name", "price", "category"]
+  ) {
+    id
+    attributes {
+      name
+      value
+    }
+  }
+}
+```
+
+### Dynamic Query with Filtering
+
+Request specific attributes with filtering:
 
 ```graphql
 query {
@@ -254,6 +770,310 @@ query {
     attributes {
       name
       value
+    }
+  }
+}
+```
+
+### Computed and Nested Fields
+
+Request computed or nested fields:
+
+```graphql
+query {
+  dynamicProductQuery(
+    attributes: ["name", "category", "stockStatus", "priceWithTax", "relatedProductCount"]
+    filter: {
+      minRating: 4.0
+    }
+  ) {
+    id
+    attributes {
+      name
+      value
+    }
+  }
+}
+```
+
+### All Available Product Attributes
+
+Request all available attributes:
+
+```graphql
+query {
+  availableProductAttributes
+}
+```
+
+## GraphQL Mutations
+
+### Create Operations
+
+#### Add a New Product
+
+Basic product creation:
+
+```graphql
+mutation {
+  addProduct(product: {
+    name: "Gaming Mouse"
+    description: "High-precision gaming mouse with customizable buttons"
+    price: 79.99
+    category: "Gaming"
+    inStock: true
+    rating: 4.2
+    tags: ["gaming", "mouse", "rgb"]
+    stockQuantity: 25
+    popularity: 85
+  }) {
+    id
+    name
+    tags
+  }
+}
+```
+
+#### Add a Product with All Fields
+
+Complete product creation with all available fields:
+
+```graphql
+mutation {
+  addProduct(product: {
+    name: "Professional Camera"
+    description: "High-end DSLR camera for professional photography"
+    price: 1299.99
+    category: "Photography"
+    inStock: true
+    rating: 4.8
+    tags: ["camera", "professional", "dslr", "high-resolution"]
+    stockQuantity: 12
+    popularity: 90
+    customAttributes: {
+      "sensorType": "Full-frame CMOS"
+      "resolution": "45.7 MP"
+      "iso": "100-25600"
+      "shutterSpeed": "1/8000s"
+      "weight": "780g"
+    }
+  }) {
+    id
+    name
+    description
+    price
+    category
+    customAttributes
+  }
+}
+```
+
+#### Bulk Add Products
+
+Add multiple products at once:
+
+```graphql
+mutation {
+  bulkAddProducts(products: [
+    {
+      name: "Wireless Mouse"
+      description: "Comfortable wireless mouse with long battery life"
+      price: 49.99
+      category: "Computers"
+      inStock: true
+      rating: 4.0
+      tags: ["mouse", "wireless", "computer"]
+      stockQuantity: 30
+      popularity: 75
+    },
+    {
+      name: "Mechanical Keyboard"
+      description: "Tactile mechanical keyboard with customizable switches"
+      price: 129.99
+      category: "Computers"
+      inStock: true
+      rating: 4.3
+      tags: ["keyboard", "mechanical", "typing"]
+      stockQuantity: 20
+      popularity: 80
+    },
+    {
+      name: "Ultra-wide Monitor"
+      description: "34-inch curved ultra-wide monitor for immersive experience"
+      price: 449.99
+      category: "Computers"
+      inStock: true
+      rating: 4.6
+      tags: ["monitor", "ultra-wide", "curved", "gaming"]
+      stockQuantity: 15
+      popularity: 85
+    }
+  ]) {
+    id
+    name
+    category
+  }
+}
+```
+
+### Update Operations
+
+#### Update a Product
+
+Basic product update:
+
+```graphql
+mutation {
+  updateProduct(
+    id: "1",
+    product: {
+      name: "Premium Laptop"
+      description: "Updated description with new features"
+      price: 1499.99
+      category: "Electronics"
+      inStock: true
+      tags: ["laptop", "premium", "powerful"]
+    }
+  ) {
+    id
+    name
+    price
+    description
+    tags
+  }
+}
+```
+
+#### Update Specific Product Fields
+
+Update only specific fields of a product:
+
+```graphql
+mutation {
+  updateProduct(
+    id: "2",
+    product: {
+      price: 599.99
+      inStock: false
+      stockQuantity: 0
+    }
+  ) {
+    id
+    name
+    price
+    inStock
+    stockQuantity
+    updatedAt
+  }
+}
+```
+
+#### Update Product Tags
+
+Add or remove tags from a product:
+
+```graphql
+mutation {
+  updateProductTags(
+    id: "3",
+    addTags: ["bestseller", "popular"],
+    removeTags: ["outdated"]
+  ) {
+    id
+    name
+    tags
+  }
+}
+```
+
+#### Update Product Custom Attributes
+
+Update custom attributes for a product:
+
+```graphql
+mutation {
+  updateProductAttributes(
+    id: "4",
+    attributes: {
+      "color": "Midnight Black"
+      "material": "Aircraft-grade aluminum"
+      "warranty": "2 years"
+    }
+  ) {
+    id
+    name
+    customAttributes
+  }
+}
+```
+
+### Delete Operations
+
+#### Delete a Single Product
+
+```graphql
+mutation {
+  deleteProduct(id: "3")
+}
+```
+
+#### Bulk Delete Products
+
+Delete multiple products at once:
+
+```graphql
+mutation {
+  bulkDeleteProducts(ids: ["5", "6", "7"])
+}
+```
+
+#### Delete Products by Category
+
+Delete all products in a specific category:
+
+```graphql
+mutation {
+  deleteProductsByCategory(category: "Outdated")
+}
+```
+
+### Product Relationship Operations
+
+#### Add Related Products
+
+Create relationships between products:
+
+```graphql
+mutation {
+  addRelatedProducts(
+    productId: "1",
+    relatedProductIds: ["2", "3", "4"]
+  ) {
+    id
+    name
+    relatedProducts {
+      id
+      name
+    }
+  }
+}
+```
+
+#### Add Frequently Bought Together Products
+
+Specify products that are frequently bought together:
+
+```graphql
+mutation {
+  addFrequentlyBoughtTogether(
+    productId: "1",
+    frequentlyBoughtWithIds: ["5", "8"]
+  ) {
+    id
+    name
+    frequentlyBoughtWith {
+      id
+      name
     }
   }
 }
@@ -278,10 +1098,6 @@ The product filtering system is built with a layered architecture:
 The `ProductFilter` class in `com.example.graphql.dto` defines the filter structure:
 
 ```java
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class ProductFilter {
     private String nameContains;
     private Double minPrice;
@@ -295,6 +1111,8 @@ public class ProductFilter {
     private String createdBefore;
     private Integer minStockQuantity;
     private Integer minPopularity;
+    
+    // Getters and setters
 }
 ```
 
@@ -315,7 +1133,76 @@ public static Specification<Product> getSpecification(ProductFilter filter) {
             ));
         }
         
-        // Other filters...
+        // Filter by price range
+        if (filter.getMinPrice() != null) {
+            predicates.add(criteriaBuilder.greaterThanOrEqualTo(
+                root.get("price"), filter.getMinPrice()
+            ));
+        }
+        
+        if (filter.getMaxPrice() != null) {
+            predicates.add(criteriaBuilder.lessThanOrEqualTo(
+                root.get("price"), filter.getMaxPrice()
+            ));
+        }
+        
+        // Filter by categories
+        if (filter.getCategories() != null && !filter.getCategories().isEmpty()) {
+            predicates.add(root.get("category").in(filter.getCategories()));
+        }
+        
+        // Filter by in-stock status
+        if (filter.getInStock() != null) {
+            predicates.add(criteriaBuilder.equal(
+                root.get("inStock"), filter.getInStock()
+            ));
+        }
+        
+        // Filter by minimum rating
+        if (filter.getMinRating() != null) {
+            predicates.add(criteriaBuilder.greaterThanOrEqualTo(
+                root.get("rating"), filter.getMinRating()
+            ));
+        }
+        
+        // Filter by minimum stock quantity
+        if (filter.getMinStockQuantity() != null) {
+            predicates.add(criteriaBuilder.greaterThanOrEqualTo(
+                root.get("stockQuantity"), filter.getMinStockQuantity()
+            ));
+        }
+        
+        // Filter by minimum popularity
+        if (filter.getMinPopularity() != null) {
+            predicates.add(criteriaBuilder.greaterThanOrEqualTo(
+                root.get("popularity"), filter.getMinPopularity()
+            ));
+        }
+        
+        // Filter by creation date range
+        if (filter.getCreatedAfter() != null) {
+            try {
+                LocalDateTime dateTime = LocalDateTime.parse(filter.getCreatedAfter(), 
+                    DateTimeFormatter.ISO_DATE_TIME);
+                predicates.add(criteriaBuilder.greaterThanOrEqualTo(
+                    root.get("createdAt"), dateTime
+                ));
+            } catch (Exception e) {
+                // Handle date parsing error
+            }
+        }
+        
+        if (filter.getCreatedBefore() != null) {
+            try {
+                LocalDateTime dateTime = LocalDateTime.parse(filter.getCreatedBefore(), 
+                    DateTimeFormatter.ISO_DATE_TIME);
+                predicates.add(criteriaBuilder.lessThanOrEqualTo(
+                    root.get("createdAt"), dateTime
+                ));
+            } catch (Exception e) {
+                // Handle date parsing error
+            }
+        }
         
         return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
     };
@@ -328,16 +1215,76 @@ For more complex filtering that can't be efficiently done at the database level,
 
 ```java
 private boolean matchesFilter(Product product, ProductFilter filter) {
-    // Various filter conditions
+    // Check name contains filter
+    if (filter.getNameContains() != null && !filter.getNameContains().isEmpty()) {
+        if (!product.getName().toLowerCase().contains(filter.getNameContains().toLowerCase())) {
+            return false;
+        }
+    }
     
-    // Example: Filter by price changed
+    // Check price range filter
+    if (filter.getMinPrice() != null && product.getPrice() < filter.getMinPrice()) {
+        return false;
+    }
+    
+    if (filter.getMaxPrice() != null && product.getPrice() > filter.getMaxPrice()) {
+        return false;
+    }
+    
+    // Check categories filter
+    if (filter.getCategories() != null && !filter.getCategories().isEmpty()) {
+        if (!filter.getCategories().contains(product.getCategory())) {
+            return false;
+        }
+    }
+    
+    // Check in-stock filter
+    if (filter.getInStock() != null && product.isInStock() != filter.getInStock()) {
+        return false;
+    }
+    
+    // Check minimum rating filter
+    if (filter.getMinRating() != null && product.getRating() < filter.getMinRating()) {
+        return false;
+    }
+    
+    // Check tags filter
+    if (filter.getHasTags() != null && !filter.getHasTags().isEmpty()) {
+        if (product.getTags() == null || product.getTags().isEmpty()) {
+            return false;
+        }
+        
+        boolean hasMatchingTag = false;
+        for (String tag : filter.getHasTags()) {
+            if (product.getTags().contains(tag)) {
+                hasMatchingTag = true;
+                break;
+            }
+        }
+        
+        if (!hasMatchingTag) {
+            return false;
+        }
+    }
+    
+    // Check price changed filter
     if (filter.getHasPriceChanged() != null && 
         filter.getHasPriceChanged() && 
         !product.hasPriceChanged()) {
         return false;
     }
     
-    // More conditions...
+    // Check minimum stock quantity
+    if (filter.getMinStockQuantity() != null && 
+        product.getStockQuantity() < filter.getMinStockQuantity()) {
+        return false;
+    }
+    
+    // Check minimum popularity
+    if (filter.getMinPopularity() != null && 
+        product.getPopularity() < filter.getMinPopularity()) {
+        return false;
+    }
     
     return true;
 }
@@ -372,256 +1319,6 @@ The filtering system is designed to be extensible:
 - Pagination is implemented to limit result set size for large queries
 - Proper indexing of filtered columns is important for production deployments
 
-## Sample GraphQL Queries
-
-### Basic Queries
-
-#### Get All Products
-
-```graphql
-query {
-  allProducts {
-    id
-    name
-    description
-    price
-    category
-    inStock
-    rating
-    tags
-    createdAt
-    updatedAt
-  }
-}
-```
-
-#### Get Product by ID
-
-```graphql
-query {
-  productById(id: "1") {
-    id
-    name
-    description
-    price
-    rating
-    tags
-  }
-}
-```
-
-#### Get Products by Category
-
-```graphql
-query {
-  productsByCategory(category: "Electronics") {
-    id
-    name
-    price
-    category
-  }
-}
-```
-
-### Advanced Queries with Filtering, Sorting and Pagination
-
-#### Get Products with Price Range
-
-```graphql
-query {
-  productsWithFilter(
-    filter: {
-      minPrice: 100
-      maxPrice: 500
-      inStock: true
-    }
-    sort: {
-      field: PRICE
-      direction: ASC
-    }
-    page: {
-      page: 0
-      size: 5
-    }
-  ) {
-    content {
-      id
-      name
-      price
-      category
-      rating
-    }
-    pageInfo {
-      totalElements
-      totalPages
-      currentPage
-      size
-      hasNext
-      hasPrevious
-    }
-  }
-}
-```
-
-#### Search Products by Name and Category
-
-```graphql
-query {
-  productsWithFilter(
-    filter: {
-      nameContains: "smart"
-      categories: ["Electronics", "Mobile Phones", "Smart Home"]
-    }
-  ) {
-    content {
-      id
-      name
-      category
-      price
-      tags
-    }
-    pageInfo {
-      totalElements
-    }
-  }
-}
-```
-
-#### Get Top-Rated Products
-
-```graphql
-query {
-  productsWithFilter(
-    filter: {
-      minRating: 4.5
-    }
-    sort: {
-      field: RATING
-      direction: DESC
-    }
-  ) {
-    content {
-      name
-      rating
-      category
-    }
-  }
-}
-```
-
-#### Find Products by Tags
-
-```graphql
-query {
-  productsWithFilter(
-    filter: {
-      hasTags: ["wireless", "bluetooth"]
-    }
-  ) {
-    content {
-      name
-      category
-      tags
-    }
-  }
-}
-```
-
-## Sample GraphQL Mutations
-
-### Basic Mutations
-
-#### Add a New Product
-
-```graphql
-mutation {
-  addProduct(product: {
-    name: "Gaming Mouse"
-    description: "High-precision gaming mouse with customizable buttons"
-    price: 79.99
-    category: "Gaming"
-    inStock: true
-    rating: 4.2
-    tags: ["gaming", "mouse", "rgb"]
-  }) {
-    id
-    name
-    tags
-  }
-}
-```
-
-#### Update a Product
-
-```graphql
-mutation {
-  updateProduct(
-    id: "1",
-    product: {
-      name: "Premium Laptop"
-      description: "Updated description with new features"
-      price: 1499.99
-      category: "Electronics"
-      inStock: true
-      tags: ["laptop", "premium", "powerful"]
-    }
-  ) {
-    id
-    name
-    price
-    tags
-  }
-}
-```
-
-#### Delete a Product
-
-```graphql
-mutation {
-  deleteProduct(id: "3")
-}
-```
-
-### Bulk Operations
-
-#### Bulk Add Products
-
-```graphql
-mutation {
-  bulkAddProducts(products: [
-    {
-      name: "Wireless Mouse"
-      description: "Comfortable wireless mouse with long battery life"
-      price: 49.99
-      category: "Computers"
-      inStock: true
-      rating: 4.0
-      tags: ["mouse", "wireless", "computer"]
-    },
-    {
-      name: "Mechanical Keyboard"
-      description: "Tactile mechanical keyboard with customizable switches"
-      price: 129.99
-      category: "Computers"
-      inStock: true
-      rating: 4.3
-      tags: ["keyboard", "mechanical", "typing"]
-    }
-  ]) {
-    id
-    name
-  }
-}
-```
-
-#### Bulk Delete Products
-
-```graphql
-mutation {
-  bulkDeleteProducts(ids: ["5", "6", "7"])
-}
-```
-
 ## Project Structure
 
 - `src/main/java/com/example/graphql/`
@@ -632,7 +1329,43 @@ mutation {
   - `service/` - Business logic services
   - `dto/` - Data transfer objects for GraphQL input types
   - `config/` - Configuration classes including data loader and GraphQL scalar configuration
+  - `resolver/` - GraphQL resolvers for queries and mutations
 
 - `src/main/resources/`
   - `application.properties` - Application configuration
-  - `graphql/schema.graphqls` - GraphQL schema definition 
+  - `graphql/schema.graphqls` - GraphQL schema definition
+  - `data.sql` - Initial data script for H2 database
+
+## Testing
+
+The application includes comprehensive test coverage:
+
+- Unit tests for DTO classes
+- Integration tests for repositories and specifications
+- End-to-end tests for GraphQL queries and mutations
+
+## Error Handling
+
+The application implements robust error handling:
+
+- GraphQL-specific error responses
+- Validation of input data
+- Proper exception handling throughout the application
+
+## Security Considerations
+
+When deploying to production, consider:
+
+- Adding authentication and authorization
+- Implementing rate limiting
+- Securing GraphQL against common vulnerabilities
+- Protecting sensitive data
+
+## Performance Optimization
+
+The application is optimized for performance:
+
+- Efficient database query generation
+- Pagination to handle large result sets
+- Proper use of caching
+- Query depth and complexity analysis 
