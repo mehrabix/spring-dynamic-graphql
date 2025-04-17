@@ -1327,6 +1327,136 @@ The application is optimized for performance:
 
 The system can be extended with the following features to create a powerful reporting platform:
 
+### TimeframeType Examples
+
+The system supports different timeframe types for reports through the `TimeframeType` enum. Here are examples of how each timeframe type formats dates and groups data:
+
+#### DAILY
+
+Daily timeframes break down data by individual days, with one data point per day:
+
+```graphql
+query {
+  salesReportByTimeframe(
+    timeframe: DAILY,
+    startDate: "2023-01-01",
+    endDate: "2023-01-07",
+    filter: {
+      categories: ["Electronics"]
+    }
+  ) {
+    period  # "2023-01-01", "2023-01-02", etc.
+    totalSales
+    totalRevenue
+  }
+}
+```
+
+#### WEEKLY
+
+Weekly timeframes group data by 7-day periods:
+
+```graphql
+query {
+  salesReportByTimeframe(
+    timeframe: WEEKLY,
+    startDate: "2023-01-01",
+    endDate: "2023-02-28",
+    filter: {
+      categories: ["Electronics"]
+    }
+  ) {
+    period  # "Week 2023-01-01 to 2023-01-07", "Week 2023-01-08 to 2023-01-14", etc.
+    totalSales
+    totalRevenue
+  }
+}
+```
+
+#### MONTHLY
+
+Monthly timeframes aggregate data by calendar months:
+
+```graphql
+query {
+  salesReportByTimeframe(
+    timeframe: MONTHLY,
+    startDate: "2023-01-01",
+    endDate: "2023-12-31",
+    filter: {
+      categories: ["Electronics"]
+    }
+  ) {
+    period  # "JANUARY 2023", "FEBRUARY 2023", etc.
+    totalSales
+    totalRevenue
+  }
+}
+```
+
+#### QUARTERLY
+
+Quarterly timeframes aggregate data by fiscal quarters:
+
+```graphql
+query {
+  salesReportByTimeframe(
+    timeframe: QUARTERLY,
+    startDate: "2023-01-01",
+    endDate: "2023-12-31",
+    filter: {
+      categories: ["Electronics"]
+    }
+  ) {
+    period  # "Q1 2023", "Q2 2023", etc.
+    totalSales
+    totalRevenue
+  }
+}
+```
+
+#### YEARLY
+
+Yearly timeframes aggregate data by calendar years:
+
+```graphql
+query {
+  salesReportByTimeframe(
+    timeframe: YEARLY,
+    startDate: "2020-01-01",
+    endDate: "2023-12-31",
+    filter: {
+      categories: ["Electronics"]
+    }
+  ) {
+    period  # "2020", "2021", "2022", "2023"
+    totalSales
+    totalRevenue
+  }
+}
+```
+
+#### CUSTOM
+
+Custom timeframes treat the entire date range as a single period:
+
+```graphql
+query {
+  salesReportByTimeframe(
+    timeframe: CUSTOM,
+    startDate: "2023-04-15",
+    endDate: "2023-05-15",
+    filter: {
+      categories: ["Electronics"]
+    }
+  ) {
+    period  # "2023-04-15 to 2023-05-15"
+    totalSales
+    totalRevenue
+  }
+}
+```
+
 ### Time-Based Aggregations
 
 Analyze data across different time periods with built-in time aggregation functions:
