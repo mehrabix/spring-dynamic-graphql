@@ -1,13 +1,46 @@
 type Query {
+    # Basic queries
     allProducts: [Product]
     productById(id: ID!): Product
     productsByCategory(category: String!): [Product]
+    
+    # Advanced queries with filtering, sorting and pagination
+    productsWithFilter(filter: ProductFilter, sort: ProductSort, page: PageInput): ProductPage!
+    
+    # Aggregation and analytics
+    productStats: ProductStats!
+    productStatsByCategory(category: String!): ProductStats!
+    productStatsByFilter(filter: ProductFilter): ProductStats!
+    
+    # Dynamic attribute query
+    dynamicProductQuery(attributes: [String!]!, filter: ProductFilter): [DynamicProduct!]!
+    
+    # Product relationships and graph traversal
+    relatedProducts(id: ID!, maxResults: Int = 5): [Product]
+    frequentlyBoughtTogether(id: ID!, maxResults: Int = 3): [Product]
 }
 
 type Mutation {
     addProduct(product: ProductInput!): Product
     updateProduct(id: ID!, product: ProductInput!): Product
     deleteProduct(id: ID!): Boolean
+    
+    # Bulk operations
+    bulkAddProducts(products: [ProductInput!]!): [Product]
+    bulkDeleteProducts(ids: [ID!]!): Int
+    
+    # Partial updates
+    updateProductAttributes(id: ID!, attributes: ProductAttributesInput!): Product
+    
+    # Tag operations
+    addProductTag(id: ID!, tag: String!): Product
+    removeProductTag(id: ID!, tag: String!): Product
+}
+
+type Subscription {
+    productUpdated: Product
+    productPriceChanged(minPriceDifference: Float): ProductPriceChange
+    lowStockAlert(threshold: Int = 5): Product
 }
 
 type Product {
@@ -17,6 +50,77 @@ type Product {
     price: Float!
     category: String
     inStock: Boolean
+    rating: Float
+    tags: [String]
+    createdAt: String
+    updatedAt: String
+    stockQuantity: Int
+    popularity: Int
+}
+
+# Dynamic object that can return specific requested attributes
+type DynamicProduct {
+    id: ID!
+    attributes: [ProductAttribute!]
+}
+
+type ProductAttribute {
+    name: String!
+    value: String
+}
+
+# For product price change subscription
+type ProductPriceChange {
+    product: Product!
+    oldPrice: Float!
+    newPrice: Float!
+    percentChange: Float!
+}
+
+# Aggregation statistics
+type ProductStats {
+    count: Int!
+    avgPrice: Float!
+    minPrice: Float!
+    maxPrice: Float!
+    totalProducts: Int!
+    inStockCount: Int!
+    outOfStockCount: Int!
+    priceDistribution: PriceDistribution!
+    categoryDistribution: [CategoryCount!]!
+    ratingDistribution: [RatingCount!]!
+    tagStats: [TagStat!]!
+}
+
+type PriceDistribution {
+    lowRange: PriceRange!  # $0-$99
+    midRange: PriceRange!  # $100-$499
+    highRange: PriceRange! # $500+
+}
+
+type PriceRange {
+    min: Float!
+    max: Float!
+    count: Int!
+    percentage: Float!
+}
+
+type CategoryCount {
+    category: String!
+    count: Int!
+    percentage: Float!
+}
+
+type RatingCount {
+    rating: Float!
+    count: Int!
+    percentage: Float!
+}
+
+type TagStat {
+    tag: String!
+    count: Int!
+    percentage: Float!
 }
 
 input ProductInput {
@@ -25,4 +129,77 @@ input ProductInput {
     price: Float!
     category: String
     inStock: Boolean
+    rating: Float
+    tags: [String]
+    stockQuantity: Int
+}
+
+# For partial updates
+input ProductAttributesInput {
+    name: String
+    description: String
+    price: Float
+    category: String
+    inStock: Boolean
+    rating: Float
+    tags: [String]
+    stockQuantity: Int
+}
+
+# Filter input for advanced queries
+input ProductFilter {
+    nameContains: String
+    minPrice: Float
+    maxPrice: Float
+    categories: [String]
+    inStock: Boolean
+    minRating: Float
+    hasTags: [String]
+    hasPriceChanged: Boolean
+    createdAfter: String
+    createdBefore: String
+    minStockQuantity: Int
+    minPopularity: Int
+}
+
+# Sorting input for advanced queries
+input ProductSort {
+    field: ProductSortField!
+    direction: SortDirection! = ASC
+}
+
+enum ProductSortField {
+    ID
+    NAME
+    PRICE
+    RATING
+    CREATED_AT
+    POPULARITY
+    STOCK_QUANTITY
+}
+
+enum SortDirection {
+    ASC
+    DESC
+}
+
+# Pagination input
+input PageInput {
+    page: Int! = 0
+    size: Int! = 10
+}
+
+# Paginated response
+type ProductPage {
+    content: [Product]!
+    pageInfo: PageInfo!
+}
+
+type PageInfo {
+    totalElements: Int!
+    totalPages: Int!
+    currentPage: Int!
+    size: Int!
+    hasNext: Boolean!
+    hasPrevious: Boolean!
 } 

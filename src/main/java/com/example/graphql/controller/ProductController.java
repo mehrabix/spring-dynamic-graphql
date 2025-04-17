@@ -1,6 +1,10 @@
 package com.example.graphql.controller;
 
+import com.example.graphql.dto.PageInput;
+import com.example.graphql.dto.ProductFilter;
 import com.example.graphql.dto.ProductInput;
+import com.example.graphql.dto.ProductPage;
+import com.example.graphql.dto.ProductSort;
 import com.example.graphql.model.Product;
 import com.example.graphql.service.ProductService;
 import org.slf4j.Logger;
@@ -11,7 +15,9 @@ import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 public class ProductController {
@@ -24,6 +30,7 @@ public class ProductController {
         this.productService = productService;
     }
     
+    // Basic queries
     @QueryMapping
     public List<Product> allProducts() {
         try {
@@ -60,19 +67,27 @@ public class ProductController {
         }
     }
     
+    // Advanced query with filtering, sorting and pagination
+    @QueryMapping
+    public ProductPage productsWithFilter(
+            @Argument ProductFilter filter,
+            @Argument ProductSort sort,
+            @Argument PageInput page) {
+        try {
+            logger.info("Executing advanced product query with filters");
+            return productService.getProductsWithFilter(filter, sort, page);
+        } catch (Exception e) {
+            logger.error("Error executing advanced product query", e);
+            throw e;
+        }
+    }
+    
+    // Basic mutations
     @MutationMapping
     public Product addProduct(@Argument ProductInput product) {
         try {
             logger.info("Adding new product: {}", product.getName());
-            Product newProduct = new Product(
-                null,
-                product.getName(),
-                product.getDescription(),
-                product.getPrice(),
-                product.getCategory(),
-                product.getInStock()
-            );
-            
+            Product newProduct = mapInputToProduct(product);
             return productService.addProduct(newProduct);
         } catch (Exception e) {
             logger.error("Error adding product", e);
@@ -85,14 +100,8 @@ public class ProductController {
         try {
             logger.info("Updating product with ID: {}", id);
             Long productId = Long.parseLong(id);
-            Product updatedProduct = new Product(
-                productId,
-                product.getName(),
-                product.getDescription(),
-                product.getPrice(),
-                product.getCategory(),
-                product.getInStock()
-            );
+            Product updatedProduct = mapInputToProduct(product);
+            updatedProduct.setId(productId);
             
             return productService.updateProduct(productId, updatedProduct).orElse(null);
         } catch (Exception e) {
@@ -111,5 +120,49 @@ public class ProductController {
             logger.error("Error deleting product with ID: {}", id, e);
             throw e;
         }
+    }
+    
+    // Bulk operations
+    @MutationMapping
+    public List<Product> bulkAddProducts(@Argument List<ProductInput> products) {
+        try {
+            logger.info("Adding {} products in bulk", products.size());
+            List<Product> productEntities = products.stream()
+                .map(this::mapInputToProduct)
+                .collect(Collectors.toList());
+            
+            return productService.bulkAddProducts(productEntities);
+        } catch (Exception e) {
+            logger.error("Error adding products in bulk", e);
+            throw e;
+        }
+    }
+    
+    @MutationMapping
+    public Integer bulkDeleteProducts(@Argument List<String> ids) {
+        try {
+            logger.info("Deleting {} products in bulk", ids.size());
+            List<Long> productIds = ids.stream()
+                .map(Long::parseLong)
+                .collect(Collectors.toList());
+            
+            return productService.bulkDeleteProducts(productIds);
+        } catch (Exception e) {
+            logger.error("Error deleting products in bulk", e);
+            throw e;
+        }
+    }
+    
+    // Helper methods
+    private Product mapInputToProduct(ProductInput input) {
+        Product product = new Product();
+        product.setName(input.getName());
+        product.setDescription(input.getDescription());
+        product.setPrice(input.getPrice());
+        product.setCategory(input.getCategory());
+        product.setInStock(input.getInStock());
+        product.setRating(input.getRating());
+        product.setTags(input.getTags());
+        return product;
     }
 } 
