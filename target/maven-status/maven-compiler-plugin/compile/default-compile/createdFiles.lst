@@ -4,9 +4,11 @@ com\example\graphql\config\ScalarConfig.class
 com\example\graphql\dto\PriceRange.class
 com\example\graphql\dto\ProductStats.class
 com\example\graphql\dto\CategoryCount.class
+com\example\graphql\service\ReportingService$PeriodBoundary.class
 com\example\graphql\dto\ProductPriceChange.class
 com\example\graphql\repository\ProductRepository.class
 com\example\graphql\dto\ProductAttributesInput.class
+com\example\graphql\resolver\ReportingResolver.class
 com\example\graphql\GraphQLDemoApplication.class
 com\example\graphql\dto\ProductPage.class
 com\example\graphql\config\DataLoader.class
@@ -17,7 +19,9 @@ com\example\graphql\config\GraphQLExceptionHandler.class
 com\example\graphql\service\ProductService.class
 com\example\graphql\dto\ProductAttribute.class
 com\example\graphql\dto\ProductFilter.class
+com\example\graphql\service\ReportingService$1.class
 com\example\graphql\controller\TestController.class
+com\example\graphql\dto\TimeframeType.class
 com\example\graphql\service\ProductStatsService.class
 com\example\graphql\model\Product.class
 com\example\graphql\repository\ProductSpecification.class
@@ -26,8 +30,11 @@ com\example\graphql\service\DynamicQueryService.class
 com\example\graphql\controller\ProductController.class
 com\example\graphql\dto\ProductInput.class
 com\example\graphql\dto\ProductSort$ProductSortField.class
+com\example\graphql\service\ReportingService.class
 com\example\graphql\config\ScalarConfig$1.class
 com\example\graphql\dto\RatingCount.class
+com\example\graphql\dto\SalesReportPeriod.class
 com\example\graphql\dto\PriceDistribution.class
+com\example\graphql\dto\SalesReportPeriod$TopSellingProduct.class
 com\example\graphql\dto\DynamicProduct.class
 com\example\graphql\dto\ProductSort$SortDirection.class

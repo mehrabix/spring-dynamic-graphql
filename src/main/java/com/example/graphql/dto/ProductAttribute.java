@@ -2,12 +2,17 @@ package com.example.graphql.dto;
 
 public class ProductAttribute {
     private String name;
-    private String value;
+    private Object value;
 
     public ProductAttribute() {
     }
 
     public ProductAttribute(String name, String value) {
+        this.name = name;
+        this.value = value;
+    }
+    
+    public ProductAttribute(String name, Object value) {
         this.name = name;
         this.value = value;
     }
@@ -20,11 +25,15 @@ public class ProductAttribute {
         this.name = name;
     }
 
-    public String getValue() {
+    public Object getValue() {
         return value;
     }
 
     public void setValue(String value) {
+        this.value = value;
+    }
+    
+    public void setValue(Object value) {
         this.value = value;
     }
 } 

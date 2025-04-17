@@ -1,3 +1,8 @@
 com\example\graphql\dto\ProductFilterTest.class
-com\example\graphql\service\DynamicQueryServiceTest.class
+com\example\graphql\dto\ProductAttributeTest.class
 com\example\graphql\repository\ProductSpecificationTest.class
+com\example\graphql\service\ProductStatsServiceTest.class
+com\example\graphql\dto\DynamicProductTest.class
+com\example\graphql\resolver\StatsResolverTest.class
+com\example\graphql\service\DynamicQueryServiceTest.class
+com\example\graphql\dto\ProductStatsTest.class

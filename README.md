@@ -1369,3 +1369,300 @@ The application is optimized for performance:
 - Pagination to handle large result sets
 - Proper use of caching
 - Query depth and complexity analysis 
+
+## Advanced Reporting Features
+
+The system can be extended with the following features to create a powerful reporting platform:
+
+### Time-Based Aggregations
+
+Analyze data across different time periods with built-in time aggregation functions:
+
+```graphql
+query {
+  salesReportByTimeframe(
+    timeframe: MONTHLY,
+    startDate: "2023-01-01",
+    endDate: "2023-12-31",
+    filter: {
+      categories: ["Electronics"]
+    }
+  ) {
+    period
+    totalSales
+    totalRevenue
+    averageOrderValue
+    topSellingProducts {
+      productId
+      productName
+      unitsSold
+      revenue
+    }
+  }
+}
+```
+
+### Comparative Analytics
+
+Compare metrics across different time periods or categories:
+
+```graphql
+query {
+  comparativeReport(
+    dimension: CATEGORY,
+    metric: REVENUE,
+    periods: [
+      {name: "Q1", startDate: "2023-01-01", endDate: "2023-03-31"},
+      {name: "Q2", startDate: "2023-04-01", endDate: "2023-06-30"}
+    ]
+  ) {
+    dimensionValue
+    metricValues {
+      periodName
+      value
+      percentageChange
+    }
+  }
+}
+```
+
+### Data Export Capabilities
+
+Export report data in various formats:
+
+```graphql
+mutation {
+  exportReport(
+    reportType: PRODUCT_PERFORMANCE,
+    format: CSV,
+    filter: {
+      minPopularity: 70,
+      categories: ["Electronics"]
+    },
+    dateRange: {
+      startDate: "2023-01-01",
+      endDate: "2023-12-31"
+    }
+  ) {
+    downloadUrl
+    expiresAt
+    recordCount
+  }
+}
+```
+
+### Custom Metric Definitions
+
+Define custom metrics for specialized reporting needs:
+
+```graphql
+mutation {
+  createCustomMetric(
+    name: "ProfitMargin",
+    description: "Calculated profit margin percentage",
+    formula: "(revenue - cost) / revenue * 100",
+    applicableEntities: ["Product", "Category"]
+  ) {
+    id
+    name
+    formula
+  }
+}
+
+query {
+  productReport(
+    metrics: ["Revenue", "UnitsSold", "ProfitMargin"],
+    filter: {
+      categories: ["Electronics"]
+    }
+  ) {
+    products {
+      name
+      metrics {
+        name
+        value
+        formattedValue
+      }
+    }
+  }
+}
+```
+
+### Scheduled Reports
+
+Set up automated report generation and delivery:
+
+```graphql
+mutation {
+  scheduleReport(
+    name: "Weekly Sales Summary",
+    reportType: SALES_SUMMARY,
+    schedule: {
+      frequency: WEEKLY,
+      dayOfWeek: MONDAY,
+      time: "09:00"
+    },
+    recipients: ["reporting@example.com"],
+    format: PDF,
+    filter: {
+      categories: ["Electronics", "Home Appliances"]
+    }
+  ) {
+    id
+    name
+    schedule {
+      frequency
+      nextExecutionTime
+    }
+  }
+}
+```
+
+### Data Visualization Endpoints
+
+Generate visualization-ready data structures:
+
+```graphql
+query {
+  visualizationData(
+    type: TIME_SERIES,
+    metrics: ["Revenue", "UnitsSold"],
+    dimensions: ["Category"],
+    timeframe: DAILY,
+    startDate: "2023-01-01",
+    endDate: "2023-01-31",
+    filter: {
+      minPrice: 100
+    }
+  ) {
+    labels
+    datasets {
+      label
+      data
+      color
+    }
+  }
+}
+```
+
+### Trend Analysis
+
+Analyze trends and patterns in your data:
+
+```graphql
+query {
+  trendAnalysis(
+    metric: SALES,
+    timeframe: MONTHLY,
+    startDate: "2022-01-01",
+    endDate: "2023-12-31",
+    filter: {
+      categories: ["Electronics"]
+    }
+  ) {
+    trend {
+      direction
+      percentageChange
+      significance
+    }
+    seasonality {
+      exists
+      pattern
+      peakPeriods
+    }
+    forecast {
+      periods {
+        period
+        predictedValue
+        confidenceInterval {
+          lower
+          upper
+        }
+      }
+    }
+  }
+}
+```
+
+### Geographic Distribution
+
+Analyze data across geographic regions:
+
+```graphql
+query {
+  geographicDistribution(
+    metric: REVENUE,
+    geoLevel: COUNTRY,
+    period: {
+      startDate: "2023-01-01",
+      endDate: "2023-12-31"
+    },
+    filter: {
+      categories: ["Electronics"]
+    }
+  ) {
+    regions {
+      code
+      name
+      value
+      percentageOfTotal
+    }
+    topRegions {
+      name
+      value
+    }
+    bottomRegions {
+      name
+      value
+    }
+  }
+}
+```
+
+### Customer Segmentation Analysis
+
+Segment customers based on their behavior and attributes:
+
+```graphql
+query {
+  customerSegmentAnalysis(
+    segmentBy: ["purchaseFrequency", "averageOrderValue", "preferredCategory"],
+    period: {
+      startDate: "2023-01-01",
+      endDate: "2023-12-31"
+    }
+  ) {
+    segments {
+      name
+      customerCount
+      percentageOfTotal
+      averageMetrics {
+        name
+        value
+      }
+      topProducts {
+        name
+        unitsSold
+      }
+    }
+  }
+}
+```
+
+### Implementation Considerations
+
+To implement these reporting features efficiently:
+
+1. **Optimize Aggregation Queries**: Use database features like window functions, materialized views, or pre-aggregation tables for faster reporting
+2. **Cache Report Results**: Implement caching for reports that are expensive to generate but infrequently changed
+3. **Background Processing**: Run complex reports asynchronously and notify users when complete
+4. **Data Denormalization**: Consider denormalizing data for reporting to improve query performance
+5. **Implement Incremental Updates**: For large datasets, update reports incrementally rather than regenerating completely
+
+These advanced reporting features can be implemented using the existing architecture by extending:
+
+- GraphQL schema with new query and mutation types
+- Creating specialized service classes for different report types
+- Leveraging JPA for simple aggregations and native SQL for complex aggregations
+- Adding scheduled tasks for report generation
+- Implementing export services for different file formats 

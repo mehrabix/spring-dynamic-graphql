@@ -1,3 +1,9 @@
 C:\Users\Ahmad\spring-dynamic-graphql\src\test\java\com\example\graphql\repository\ProductSpecificationTest.java
 C:\Users\Ahmad\spring-dynamic-graphql\src\test\java\com\example\graphql\dto\ProductFilterTest.java
+C:\Users\Ahmad\spring-dynamic-graphql\src\test\java\com\example\graphql\dto\DynamicProductTest.java
+C:\Users\Ahmad\spring-dynamic-graphql\src\test\java\com\example\graphql\service\ProductStatsServiceTest.java
+C:\Users\Ahmad\spring-dynamic-graphql\src\test\java\com\example\graphql\dto\ProductAttributeTest.java
+C:\Users\Ahmad\spring-dynamic-graphql\src\test\java\com\example\graphql\dto\ProductStatsTest.java
+C:\Users\Ahmad\spring-dynamic-graphql\src\test\java\com\example\graphql\resolver\StatsResolverTest.java
 C:\Users\Ahmad\spring-dynamic-graphql\src\test\java\com\example\graphql\service\DynamicQueryServiceTest.java
+C:\Users\Ahmad\spring-dynamic-graphql\src\test\java\com\example\graphql\dto\TimeframeTypeTest.java

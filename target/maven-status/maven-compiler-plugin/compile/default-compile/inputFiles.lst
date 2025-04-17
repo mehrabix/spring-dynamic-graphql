@@ -8,6 +8,7 @@ C:\Users\Ahmad\spring-dynamic-graphql\src\main\java\com\example\graphql\dto\Prod
 C:\Users\Ahmad\spring-dynamic-graphql\src\main\java\com\example\graphql\config\GraphQLExceptionHandler.java
 C:\Users\Ahmad\spring-dynamic-graphql\src\main\java\com\example\graphql\config\DataLoader.java
 C:\Users\Ahmad\spring-dynamic-graphql\src\main\java\com\example\graphql\dto\ProductAttribute.java
+C:\Users\Ahmad\spring-dynamic-graphql\src\main\java\com\example\graphql\resolver\ReportingResolver.java
 C:\Users\Ahmad\spring-dynamic-graphql\src\main\java\com\example\graphql\dto\DynamicProduct.java
 C:\Users\Ahmad\spring-dynamic-graphql\src\main\java\com\example\graphql\service\ProductStatsService.java
 C:\Users\Ahmad\spring-dynamic-graphql\src\main\java\com\example\graphql\config\ScalarConfig.java
@@ -17,10 +18,13 @@ C:\Users\Ahmad\spring-dynamic-graphql\src\main\java\com\example\graphql\GraphQLD
 C:\Users\Ahmad\spring-dynamic-graphql\src\main\java\com\example\graphql\service\DynamicQueryService.java
 C:\Users\Ahmad\spring-dynamic-graphql\src\main\java\com\example\graphql\dto\PageInput.java
 C:\Users\Ahmad\spring-dynamic-graphql\src\main\java\com\example\graphql\repository\ProductRepository.java
+C:\Users\Ahmad\spring-dynamic-graphql\src\main\java\com\example\graphql\service\ReportingService.java
 C:\Users\Ahmad\spring-dynamic-graphql\src\main\java\com\example\graphql\dto\RatingCount.java
 C:\Users\Ahmad\spring-dynamic-graphql\src\main\java\com\example\graphql\service\ProductService.java
 C:\Users\Ahmad\spring-dynamic-graphql\src\main\java\com\example\graphql\controller\TestController.java
 C:\Users\Ahmad\spring-dynamic-graphql\src\main\java\com\example\graphql\dto\CategoryCount.java
+C:\Users\Ahmad\spring-dynamic-graphql\src\main\java\com\example\graphql\dto\SalesReportPeriod.java
+C:\Users\Ahmad\spring-dynamic-graphql\src\main\java\com\example\graphql\dto\TimeframeType.java
 C:\Users\Ahmad\spring-dynamic-graphql\src\main\java\com\example\graphql\dto\ProductInput.java
 C:\Users\Ahmad\spring-dynamic-graphql\src\main\java\com\example\graphql\model\Product.java
 C:\Users\Ahmad\spring-dynamic-graphql\src\main\java\com\example\graphql\repository\ProductSpecification.java
