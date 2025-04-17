@@ -1,0 +1,11 @@
+com\example\graphql\config\DataLoader.class
+com\example\graphql\config\GraphQLExceptionHandler.class
+com\example\graphql\config\ScalarConfig.class
+com\example\graphql\service\ProductService.class
+com\example\graphql\controller\TestController.class
+com\example\graphql\model\Product.class
+com\example\graphql\repository\ProductRepository.class
+com\example\graphql\controller\ProductController.class
+com\example\graphql\dto\ProductInput.class
+com\example\graphql\config\ScalarConfig$1.class
+com\example\graphql\GraphQLDemoApplication.class

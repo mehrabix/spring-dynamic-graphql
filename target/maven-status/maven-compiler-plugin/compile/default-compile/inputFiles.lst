@@ -1,0 +1,10 @@
+C:\Users\Ahmad\spring-dynamic-graphql\src\main\java\com\example\graphql\GraphQLDemoApplication.java
+C:\Users\Ahmad\spring-dynamic-graphql\src\main\java\com\example\graphql\service\ProductService.java
+C:\Users\Ahmad\spring-dynamic-graphql\src\main\java\com\example\graphql\controller\TestController.java
+C:\Users\Ahmad\spring-dynamic-graphql\src\main\java\com\example\graphql\config\GraphQLExceptionHandler.java
+C:\Users\Ahmad\spring-dynamic-graphql\src\main\java\com\example\graphql\dto\ProductInput.java
+C:\Users\Ahmad\spring-dynamic-graphql\src\main\java\com\example\graphql\model\Product.java
+C:\Users\Ahmad\spring-dynamic-graphql\src\main\java\com\example\graphql\config\DataLoader.java
+C:\Users\Ahmad\spring-dynamic-graphql\src\main\java\com\example\graphql\repository\ProductRepository.java
+C:\Users\Ahmad\spring-dynamic-graphql\src\main\java\com\example\graphql\controller\ProductController.java
+C:\Users\Ahmad\spring-dynamic-graphql\src\main\java\com\example\graphql\config\ScalarConfig.java
