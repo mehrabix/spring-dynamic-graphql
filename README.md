@@ -880,7 +880,6 @@ mutation {
     rating: 4.7
     tags: ["gaming", "monitor", "ultra-hd", "curved"]
     stockQuantity: 15
-    popularity: 85
   }) {
     id
     name
@@ -890,39 +889,7 @@ mutation {
 }
 ```
 
-#### Add a Product with Custom Attributes
-
-Complete product creation with custom attributes:
-
-```graphql
-mutation {
-  addProduct(product: {
-    name: "Professional Camera"
-    description: "High-end DSLR camera for professional photography"
-    price: 1299.99
-    category: "Photography"
-    inStock: true
-    rating: 4.8
-    tags: ["camera", "professional", "dslr", "high-resolution"]
-    stockQuantity: 12
-    popularity: 90
-    customAttributes: {
-      "sensorType": "Full-frame CMOS"
-      "resolution": "45.7 MP"
-      "iso": "100-25600"
-      "shutterSpeed": "1/8000s"
-      "weight": "780g"
-    }
-  }) {
-    id
-    name
-    description
-    price
-    category
-    customAttributes
-  }
-}
-```
+> **Note:** While the Product entity supports custom attributes internally, the current ProductInput schema doesn't directly expose them through the mutation API. Custom attributes can be managed through dedicated API endpoints once a product is created.
 
 #### Bulk Add Products
 
@@ -1012,9 +979,11 @@ mutation {
 }
 ```
 
-#### Partial Updates
+#### Partial Updates (Planned Feature)
 
-Update only specific attributes of a product without changing other fields:
+> **Note:** This is a planned feature that may not be fully implemented in the current version.
+
+The GraphQL schema includes support for partial updates through the `updateProductAttributes` mutation:
 
 ```graphql
 mutation {
@@ -1038,34 +1007,26 @@ mutation {
 }
 ```
 
-This is useful for updates where you only want to modify specific fields without affecting others. The server applies a patch-like update rather than a full replacement.
+This would be useful for updates where you only want to modify specific fields without affecting others. The server applies a patch-like update rather than a full replacement.
 
-#### Custom Attributes
+### Custom Attributes Support
 
-Products support custom attributes for storing key-value pairs that aren't part of the standard schema. These can be added and retrieved through the API:
+Although not directly exposed in the GraphQL input types, the Product entity supports custom attributes internally through a Map<String, String> field. This allows for storing key-value pairs that aren't part of the standard schema.
 
-```graphql
-mutation {
-  addProduct(product: {
-    name: "Specialty Coffee Machine"
-    description: "Professional grade coffee maker"
-    price: 799.99
-    category: "Kitchen Appliances"
-    customAttributes: {
-      "powerConsumption": "1200W"
-      "waterCapacity": "2L"
-      "brewingTechnology": "Pressure Extraction"
-      "warranty": "3 years"
-    }
-  }) {
-    id
-    name
-    customAttributes
-  }
-}
+The internal model provides methods to manage these attributes:
+
+```java
+// Add a custom attribute
+product.addCustomAttribute("resolution", "4K");
+
+// Get a custom attribute
+String resolution = product.getCustomAttribute("resolution");
+
+// Get all custom attributes
+Map<String, String> allAttributes = product.getCustomAttributes();
 ```
 
-When querying products, you can request these custom attributes:
+Custom attributes can be retrieved when querying products:
 
 ```graphql
 query {
@@ -1073,12 +1034,13 @@ query {
     id
     name
     price
-    customAttributes
+    # The following would return a Map of all custom attributes
+    # if any are defined for this product
   }
 }
 ```
 
-Or through the dynamic query interface:
+Through the dynamic query interface, you could potentially access these custom attributes if the implementation supports it:
 
 ```graphql
 query {
@@ -1384,11 +1346,111 @@ The application includes comprehensive test coverage:
 
 ## Error Handling
 
-The application implements robust error handling:
+The application implements robust error handling using GraphQL's standardized error format. Here are examples of common error responses:
 
-- GraphQL-specific error responses
-- Validation of input data
-- Proper exception handling throughout the application
+### Entity Not Found Error
+
+When requesting a non-existent product:
+
+```graphql
+query {
+  productById(id: "999") {
+    id
+    name
+  }
+}
+```
+
+Response:
+```json
+{
+  "data": {
+    "productById": null
+  },
+  "errors": [
+    {
+      "message": "Product not found with ID: 999",
+      "locations": [{"line": 2, "column": 3}],
+      "path": ["productById"],
+      "extensions": {
+        "classification": "NOT_FOUND"
+      }
+    }
+  ]
+}
+```
+
+### Validation Error
+
+When providing invalid input:
+
+```graphql
+mutation {
+  addProduct(product: {
+    name: "",  # Empty name is invalid
+    price: -10.0,  # Negative price is invalid
+    category: "Electronics"
+  }) {
+    id
+  }
+}
+```
+
+Response:
+```json
+{
+  "data": {
+    "addProduct": null
+  },
+  "errors": [
+    {
+      "message": "Product name cannot be empty",
+      "locations": [{"line": 2, "column": 3}],
+      "path": ["addProduct"],
+      "extensions": {
+        "classification": "ValidationError",
+        "field": "name"
+      }
+    },
+    {
+      "message": "Price must be greater than zero",
+      "locations": [{"line": 2, "column": 3}],
+      "path": ["addProduct"],
+      "extensions": {
+        "classification": "ValidationError",
+        "field": "price"
+      }
+    }
+  ]
+}
+```
+
+### Authorization Error (For Future Implementation)
+
+In a secured version of the application:
+
+```graphql
+mutation {
+  deleteProduct(id: "1")
+}
+```
+
+Response:
+```json
+{
+  "data": null,
+  "errors": [
+    {
+      "message": "Not authorized to delete products",
+      "locations": [{"line": 2, "column": 3}],
+      "path": ["deleteProduct"],
+      "extensions": {
+        "classification": "FORBIDDEN"
+      }
+    }
+  ]
+}
+```
 
 ## Security Considerations
 
@@ -1406,19 +1468,21 @@ The application is optimized for performance:
 - Efficient database query generation
 - Pagination to handle large result sets
 - Proper use of caching
-- Query depth and complexity analysis 
+- Query depth and complexity analysis
 
-## Advanced Reporting Features
+## Advanced Reporting Features (Example Extensions)
 
-The system can be extended with the following features to create a powerful reporting platform:
+> **Note:** The following reporting features are examples of how the system could be extended, but may not be fully implemented in the current version.
+
+The system could be extended with the following features to create a powerful reporting platform:
 
 ### TimeframeType Examples
 
-The system supports different timeframe types for reports through the `TimeframeType` enum. Here are examples of how each timeframe type formats dates and groups data:
+The system could support different timeframe types for reports through a `TimeframeType` enum:
 
 #### DAILY
 
-Daily timeframes break down data by individual days, with one data point per day:
+Daily timeframes would break down data by individual days:
 
 ```graphql
 query {
@@ -1439,7 +1503,7 @@ query {
 
 #### WEEKLY
 
-Weekly timeframes group data by 7-day periods:
+Weekly timeframes would group data by 7-day periods:
 
 ```graphql
 query {
@@ -1460,7 +1524,7 @@ query {
 
 #### MONTHLY
 
-Monthly timeframes aggregate data by calendar months:
+Monthly timeframes would aggregate data by calendar months:
 
 ```graphql
 query {
@@ -1481,7 +1545,7 @@ query {
 
 #### QUARTERLY
 
-Quarterly timeframes aggregate data by fiscal quarters:
+Quarterly timeframes would aggregate data by fiscal quarters:
 
 ```graphql
 query {
@@ -1502,7 +1566,7 @@ query {
 
 #### YEARLY
 
-Yearly timeframes aggregate data by calendar years:
+Yearly timeframes would aggregate data by calendar years:
 
 ```graphql
 query {
@@ -1523,7 +1587,7 @@ query {
 
 #### CUSTOM
 
-Custom timeframes treat the entire date range as a single period:
+Custom timeframes would treat the entire date range as a single period:
 
 ```graphql
 query {
@@ -1594,229 +1658,6 @@ query {
 }
 ```
 
-### Data Export Capabilities
-
-Export report data in various formats:
-
-```graphql
-mutation {
-  exportReport(
-    reportType: PRODUCT_PERFORMANCE,
-    format: CSV,
-    filter: {
-      minPopularity: 70,
-      categories: ["Electronics"]
-    },
-    dateRange: {
-      startDate: "2023-01-01",
-      endDate: "2023-12-31"
-    }
-  ) {
-    downloadUrl
-    expiresAt
-    recordCount
-  }
-}
-```
-
-### Custom Metric Definitions
-
-Define custom metrics for specialized reporting needs:
-
-```graphql
-mutation {
-  createCustomMetric(
-    name: "ProfitMargin",
-    description: "Calculated profit margin percentage",
-    formula: "(revenue - cost) / revenue * 100",
-    applicableEntities: ["Product", "Category"]
-  ) {
-    id
-    name
-    formula
-  }
-}
-
-query {
-  productReport(
-    metrics: ["Revenue", "UnitsSold", "ProfitMargin"],
-    filter: {
-      categories: ["Electronics"]
-    }
-  ) {
-    products {
-      name
-      metrics {
-        name
-        value
-        formattedValue
-      }
-    }
-  }
-}
-```
-
-### Scheduled Reports
-
-Set up automated report generation and delivery:
-
-```graphql
-mutation {
-  scheduleReport(
-    name: "Weekly Sales Summary",
-    reportType: SALES_SUMMARY,
-    schedule: {
-      frequency: WEEKLY,
-      dayOfWeek: MONDAY,
-      time: "09:00"
-    },
-    recipients: ["reporting@example.com"],
-    format: PDF,
-    filter: {
-      categories: ["Electronics", "Home Appliances"]
-    }
-  ) {
-    id
-    name
-    schedule {
-      frequency
-      nextExecutionTime
-    }
-  }
-}
-```
-
-### Data Visualization Endpoints
-
-Generate visualization-ready data structures:
-
-```graphql
-query {
-  visualizationData(
-    type: TIME_SERIES,
-    metrics: ["Revenue", "UnitsSold"],
-    dimensions: ["Category"],
-    timeframe: DAILY,
-    startDate: "2023-01-01",
-    endDate: "2023-01-31",
-    filter: {
-      minPrice: 100
-    }
-  ) {
-    labels
-    datasets {
-      label
-      data
-      color
-    }
-  }
-}
-```
-
-### Trend Analysis
-
-Analyze trends and patterns in your data:
-
-```graphql
-query {
-  trendAnalysis(
-    metric: SALES,
-    timeframe: MONTHLY,
-    startDate: "2022-01-01",
-    endDate: "2023-12-31",
-    filter: {
-      categories: ["Electronics"]
-    }
-  ) {
-    trend {
-      direction
-      percentageChange
-      significance
-    }
-    seasonality {
-      exists
-      pattern
-      peakPeriods
-    }
-    forecast {
-      periods {
-        period
-        predictedValue
-        confidenceInterval {
-          lower
-          upper
-        }
-      }
-    }
-  }
-}
-```
-
-### Geographic Distribution
-
-Analyze data across geographic regions:
-
-```graphql
-query {
-  geographicDistribution(
-    metric: REVENUE,
-    geoLevel: COUNTRY,
-    period: {
-      startDate: "2023-01-01",
-      endDate: "2023-12-31"
-    },
-    filter: {
-      categories: ["Electronics"]
-    }
-  ) {
-    regions {
-      code
-      name
-      value
-      percentageOfTotal
-    }
-    topRegions {
-      name
-      value
-    }
-    bottomRegions {
-      name
-      value
-    }
-  }
-}
-```
-
-### Customer Segmentation Analysis
-
-Segment customers based on their behavior and attributes:
-
-```graphql
-query {
-  customerSegmentAnalysis(
-    segmentBy: ["purchaseFrequency", "averageOrderValue", "preferredCategory"],
-    period: {
-      startDate: "2023-01-01",
-      endDate: "2023-12-31"
-    }
-  ) {
-    segments {
-      name
-      customerCount
-      percentageOfTotal
-      averageMetrics {
-        name
-        value
-      }
-      topProducts {
-        name
-        unitsSold
-      }
-    }
-  }
-}
-```
-
 ### Implementation Considerations
 
 To implement these reporting features efficiently:
@@ -1835,9 +1676,11 @@ These advanced reporting features can be implemented using the existing architec
 - Adding scheduled tasks for report generation
 - Implementing export services for different file formats 
 
-## GraphQL Subscriptions
+## GraphQL Subscriptions (Planned Feature)
 
-The application supports real-time data updates through GraphQL Subscriptions. These can be tested using GraphiQL's subscription support.
+> **Note:** These subscription features are defined in the GraphQL schema but may not be fully implemented in the current version.
+
+The application's schema supports real-time data updates through GraphQL Subscriptions. These could be tested using GraphiQL's subscription support when implemented.
 
 ### Product Updated Subscription
 
@@ -1887,7 +1730,9 @@ subscription {
 }
 ```
 
-## Tag Operations
+## Tag Operations (Planned Feature)
+
+> **Note:** These tag operations are defined in the GraphQL schema but may not be fully implemented in the current version.
 
 The application provides specialized operations for working with product tags.
 
