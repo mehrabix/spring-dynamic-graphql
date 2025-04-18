@@ -1,8 +1,12 @@
 com\example\graphql\dto\ProductSort.class
 com\example\graphql\dto\TagStat.class
 com\example\graphql\config\ScalarConfig.class
+com\example\graphql\config\WebSocketConfig.class
+com\example\graphql\config\WebSocketSubscriptionConfig.class
 com\example\graphql\dto\PriceRange.class
 com\example\graphql\dto\ProductStats.class
+com\example\graphql\service\ProductSubscriptionService.class
+com\example\graphql\config\WebSocketSubscriptionConfig$ProductSubscriptionPublisher.class
 com\example\graphql\dto\CategoryCount.class
 com\example\graphql\service\ReportingService$PeriodBoundary.class
 com\example\graphql\dto\ProductPriceChange.class
@@ -14,6 +18,7 @@ com\example\graphql\dto\ProductPage.class
 com\example\graphql\config\DataLoader.class
 com\example\graphql\dto\PageInfo.class
 com\example\graphql\service\ProductService$1.class
+com\example\graphql\resolver\SubscriptionResolver.class
 com\example\graphql\resolver\StatsResolver.class
 com\example\graphql\config\GraphQLExceptionHandler.class
 com\example\graphql\service\ProductService.class

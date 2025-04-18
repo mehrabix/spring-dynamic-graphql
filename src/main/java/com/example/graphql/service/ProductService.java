@@ -25,10 +25,12 @@ import java.util.Optional;
 public class ProductService {
     
     private final ProductRepository productRepository;
+    private final ProductSubscriptionService subscriptionService;
     
     @Autowired
-    public ProductService(ProductRepository productRepository) {
+    public ProductService(ProductRepository productRepository, ProductSubscriptionService subscriptionService) {
         this.productRepository = productRepository;
+        this.subscriptionService = subscriptionService;
     }
     
     // Basic operations
@@ -45,12 +47,30 @@ public class ProductService {
     }
     
     public Product addProduct(Product product) {
-        return productRepository.save(product);
+        Product savedProduct = productRepository.save(product);
+        
+        // Notify subscribers about the new product
+        subscriptionService.handleProductCreated(savedProduct);
+        
+        return savedProduct;
     }
     
     public Optional<Product> updateProduct(Long id, Product productDetails) {
         return productRepository.findById(id)
                 .map(existingProduct -> {
+                    // Keep a copy of the original product for comparison
+                    Product originalProduct = new Product();
+                    originalProduct.setId(existingProduct.getId());
+                    originalProduct.setName(existingProduct.getName());
+                    originalProduct.setDescription(existingProduct.getDescription());
+                    originalProduct.setPrice(existingProduct.getPrice());
+                    originalProduct.setCategory(existingProduct.getCategory());
+                    originalProduct.setInStock(existingProduct.getInStock());
+                    originalProduct.setRating(existingProduct.getRating());
+                    originalProduct.setTags(existingProduct.getTags());
+                    originalProduct.setStockQuantity(existingProduct.getStockQuantity());
+                    
+                    // Update the product
                     existingProduct.setName(productDetails.getName());
                     existingProduct.setDescription(productDetails.getDescription());
                     existingProduct.setPrice(productDetails.getPrice());
@@ -65,7 +85,16 @@ public class ProductService {
                         existingProduct.setTags(productDetails.getTags());
                     }
                     
-                    return productRepository.save(existingProduct);
+                    if (productDetails.getStockQuantity() != null) {
+                        existingProduct.setStockQuantity(productDetails.getStockQuantity());
+                    }
+                    
+                    Product updatedProduct = productRepository.save(existingProduct);
+                    
+                    // Notify subscribers about the update
+                    subscriptionService.handleProductUpdate(originalProduct, updatedProduct);
+                    
+                    return updatedProduct;
                 });
     }
     
@@ -80,7 +109,14 @@ public class ProductService {
     // Advanced operations
     @Transactional
     public List<Product> bulkAddProducts(List<Product> products) {
-        return productRepository.saveAll(products);
+        List<Product> savedProducts = productRepository.saveAll(products);
+        
+        // Notify subscribers about each new product
+        for (Product product : savedProducts) {
+            subscriptionService.handleProductCreated(product);
+        }
+        
+        return savedProducts;
     }
     
     @Transactional
@@ -164,5 +200,17 @@ public class ProductService {
         );
         
         return new ProductPage(page.getContent(), pageInfo);
+    }
+    
+    /**
+     * Check stock level for a product and trigger low stock alert if needed
+     * @param productId ID of the product to check
+     */
+    public void checkAndNotifyLowStock(Long productId) {
+        productRepository.findById(productId).ifPresent(product -> {
+            if (product.getStockQuantity() <= 10) {
+                subscriptionService.notifyLowStock(product);
+            }
+        });
     }
 } 

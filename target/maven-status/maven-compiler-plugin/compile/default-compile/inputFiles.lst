@@ -3,8 +3,10 @@ C:\Users\Ahmad\spring-dynamic-graphql\src\main\java\com\example\graphql\dto\Prod
 C:\Users\Ahmad\spring-dynamic-graphql\src\main\java\com\example\graphql\dto\ProductSort.java
 C:\Users\Ahmad\spring-dynamic-graphql\src\main\java\com\example\graphql\dto\TagStat.java
 C:\Users\Ahmad\spring-dynamic-graphql\src\main\java\com\example\graphql\dto\ProductPriceChange.java
+C:\Users\Ahmad\spring-dynamic-graphql\src\main\java\com\example\graphql\config\WebSocketSubscriptionConfig.java
 C:\Users\Ahmad\spring-dynamic-graphql\src\main\java\com\example\graphql\resolver\StatsResolver.java
 C:\Users\Ahmad\spring-dynamic-graphql\src\main\java\com\example\graphql\dto\ProductStats.java
+C:\Users\Ahmad\spring-dynamic-graphql\src\main\java\com\example\graphql\resolver\SubscriptionResolver.java
 C:\Users\Ahmad\spring-dynamic-graphql\src\main\java\com\example\graphql\config\GraphQLExceptionHandler.java
 C:\Users\Ahmad\spring-dynamic-graphql\src\main\java\com\example\graphql\config\DataLoader.java
 C:\Users\Ahmad\spring-dynamic-graphql\src\main\java\com\example\graphql\dto\ProductAttribute.java
@@ -22,6 +24,7 @@ C:\Users\Ahmad\spring-dynamic-graphql\src\main\java\com\example\graphql\service\
 C:\Users\Ahmad\spring-dynamic-graphql\src\main\java\com\example\graphql\dto\RatingCount.java
 C:\Users\Ahmad\spring-dynamic-graphql\src\main\java\com\example\graphql\service\ProductService.java
 C:\Users\Ahmad\spring-dynamic-graphql\src\main\java\com\example\graphql\controller\TestController.java
+C:\Users\Ahmad\spring-dynamic-graphql\src\main\java\com\example\graphql\config\WebSocketConfig.java
 C:\Users\Ahmad\spring-dynamic-graphql\src\main\java\com\example\graphql\dto\CategoryCount.java
 C:\Users\Ahmad\spring-dynamic-graphql\src\main\java\com\example\graphql\dto\SalesReportPeriod.java
 C:\Users\Ahmad\spring-dynamic-graphql\src\main\java\com\example\graphql\dto\TimeframeType.java
@@ -31,3 +34,4 @@ C:\Users\Ahmad\spring-dynamic-graphql\src\main\java\com\example\graphql\reposito
 C:\Users\Ahmad\spring-dynamic-graphql\src\main\java\com\example\graphql\controller\ProductController.java
 C:\Users\Ahmad\spring-dynamic-graphql\src\main\java\com\example\graphql\dto\PriceDistribution.java
 C:\Users\Ahmad\spring-dynamic-graphql\src\main\java\com\example\graphql\dto\PriceRange.java
+C:\Users\Ahmad\spring-dynamic-graphql\src\main\java\com\example\graphql\service\ProductSubscriptionService.java
