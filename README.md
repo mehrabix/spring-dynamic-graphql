@@ -7,7 +7,7 @@ This project demonstrates a dynamic data flow application using Spring Boot, Gra
 - Java 17
 - Spring Boot 3.2.0
 - Spring Data JPA with Specifications
-- Spring GraphQL
+- Spring GraphQL with WebSocket Subscriptions
 - H2 Database (in-memory)
 
 ## Getting Started
@@ -33,6 +33,7 @@ The application will start on port 8080 by default.
 
 - GraphQL API for CRUD operations on Products
 - Advanced filtering, sorting, and pagination
+- Real-time updates through GraphQL Subscriptions via WebSocket
 - In-memory H2 database with comprehensive demo data
 - GraphiQL interface for testing GraphQL queries
 - Dynamic querying capabilities
@@ -45,6 +46,7 @@ The application will start on port 8080 by default.
   - Username: `sa`
   - Password: (empty)
 - GraphiQL Interface: http://localhost:8080/graphiql
+- GraphQL WebSocket Endpoint: ws://localhost:8080/graphql
 
 ## Advanced Product Filtering System
 
@@ -1678,89 +1680,47 @@ These advanced reporting features can be implemented using the existing architec
 
 ## GraphQL Subscriptions (Planned Feature)
 
-> **Note:** These subscription features are defined in the GraphQL schema but may not be fully implemented in the current version.
+The application provides real-time updates through GraphQL Subscriptions over WebSocket. This allows clients to receive immediate notifications when specific events occur on the server.
 
-The application's schema supports real-time data updates through GraphQL Subscriptions. These could be tested using GraphiQL's subscription support when implemented.
+### Available Subscriptions
 
-### Product Updated Subscription
+1. **Product Updates** - Receive updates whenever a product is modified:
+   ```graphql
+   subscription {
+     productUpdated {
+       id
+       name
+       price
+       category
+       updatedAt
+     }
+   }
+   ```
 
-Subscribe to real-time updates whenever a product is updated:
+2. **Price Change Notifications** - Get notified when product prices change beyond a specified threshold:
+   ```graphql
+   subscription {
+     productPriceChanged(minPriceDifference: 5.0) {
+       product {
+         id
+         name
+       }
+       oldPrice
+       newPrice
+       percentChange
+     }
+   }
+   ```
 
-```graphql
-subscription {
-  productUpdated {
-    id
-    name
-    price
-    updatedAt
-  }
-}
-```
+3. **Low Stock Alerts** - Monitor inventory levels and receive alerts when products are running low:
+   ```graphql
+   subscription {
+     lowStockAlert(threshold: 10) {
+       id
+       name
+       stockQuantity
+       category
+     }
+   }
+   ```
 
-### Price Change Notifications
-
-Get notified when product prices change beyond a specified threshold:
-
-```graphql
-subscription {
-  productPriceChanged(minPriceDifference: 10.0) {
-    product {
-      id
-      name
-    }
-    oldPrice
-    newPrice
-    percentChange
-  }
-}
-```
-
-### Low Stock Alerts
-
-Receive alerts when products are running low on stock:
-
-```graphql
-subscription {
-  lowStockAlert(threshold: 5) {
-    id
-    name
-    stockQuantity
-    category
-  }
-}
-```
-
-## Tag Operations (Planned Feature)
-
-> **Note:** These tag operations are defined in the GraphQL schema but may not be fully implemented in the current version.
-
-The application provides specialized operations for working with product tags.
-
-### Add a Tag to a Product
-
-```graphql
-mutation {
-  addProductTag(
-    id: "1", 
-    tag: "limited-edition"
-  ) {
-    id
-    name
-    tags
-  }
-}
-```
-
-### Remove a Tag from a Product
-
-```graphql
-mutation {
-  removeProductTag(
-    id: "1",
-    tag: "limited-edition"
-  ) {
-    id
-    name
-    tags
-  }
-} 
