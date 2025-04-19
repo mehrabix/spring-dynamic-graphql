@@ -100,7 +100,31 @@ public class ProductService {
     
     public boolean deleteProduct(Long id) {
         if (productRepository.existsById(id)) {
+            // Get the product before deleting
+            Optional<Product> productOpt = productRepository.findById(id);
             productRepository.deleteById(id);
+            
+            // Notify subscribers if product was found
+            productOpt.ifPresent(product -> {
+                // Create a copy with a "deleted" marker for proper notification
+                Product updatedProduct = new Product();
+                updatedProduct.setId(product.getId());
+                updatedProduct.setName(product.getName());
+                updatedProduct.setDescription(product.getDescription());
+                updatedProduct.setPrice(product.getPrice());
+                updatedProduct.setCategory(product.getCategory());
+                updatedProduct.setInStock(false); // Mark as out of stock since it's deleted
+                updatedProduct.setRating(product.getRating());
+                updatedProduct.setTags(product.getTags());
+                updatedProduct.setStockQuantity(0); // Set stock to 0 since it's deleted
+                
+                // Use handleProductUpdate to ensure all subscribers are notified
+                subscriptionService.handleProductUpdate(product, updatedProduct);
+                
+                // Additional notification for low stock (zero stock is definitely low)
+                subscriptionService.notifyLowStock(updatedProduct);
+            });
+            
             return true;
         }
         return false;
@@ -124,7 +148,31 @@ public class ProductService {
         int count = 0;
         for (Long id : ids) {
             if (productRepository.existsById(id)) {
+                // Get the product before deleting
+                Optional<Product> productOpt = productRepository.findById(id);
                 productRepository.deleteById(id);
+                
+                // Notify subscribers if product was found
+                productOpt.ifPresent(product -> {
+                    // Create a copy with a "deleted" marker for proper notification
+                    Product updatedProduct = new Product();
+                    updatedProduct.setId(product.getId());
+                    updatedProduct.setName(product.getName());
+                    updatedProduct.setDescription(product.getDescription());
+                    updatedProduct.setPrice(product.getPrice());
+                    updatedProduct.setCategory(product.getCategory());
+                    updatedProduct.setInStock(false); // Mark as out of stock since it's deleted
+                    updatedProduct.setRating(product.getRating());
+                    updatedProduct.setTags(product.getTags());
+                    updatedProduct.setStockQuantity(0); // Set stock to 0 since it's deleted
+                    
+                    // Use handleProductUpdate to ensure all subscribers are notified
+                    subscriptionService.handleProductUpdate(product, updatedProduct);
+                    
+                    // Additional notification for low stock (zero stock is definitely low)
+                    subscriptionService.notifyLowStock(updatedProduct);
+                });
+                
                 count++;
             }
         }

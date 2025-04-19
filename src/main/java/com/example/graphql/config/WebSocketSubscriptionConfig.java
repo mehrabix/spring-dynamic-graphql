@@ -95,6 +95,11 @@ public class WebSocketSubscriptionConfig {
          * @param minPriceDifference The minimum price difference to trigger notification
          */
         public Publisher<ProductPriceChange> getPriceChangePublisher(Double minPriceDifference) {
+            // If minPriceDifference is null, don't filter based on price difference
+            if (minPriceDifference == null) {
+                return priceChangeProcessor;
+            }
+            
             return Flux.from(priceChangeProcessor)
                 .filter(priceChange -> {
                     double absDifference = Math.abs(priceChange.getNewPrice() - priceChange.getOldPrice());
