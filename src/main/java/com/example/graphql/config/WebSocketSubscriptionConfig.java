@@ -58,7 +58,8 @@ public class WebSocketSubscriptionConfig {
          * @param product The updated product
          */
         public void publishProductUpdate(Product product) {
-            logger.debug("Publishing product update for product ID: {}", product.getId());
+            logger.debug("Publishing product update for product ID: {} with operation: {}", 
+                product.getId(), product.getOperation() != null ? product.getOperation() : "UNKNOWN");
             productUpdateSink.next(product);
         }
         
@@ -68,7 +69,9 @@ public class WebSocketSubscriptionConfig {
          * @param priceChange Contains product, old price, and new price information
          */
         public void publishPriceChange(ProductPriceChange priceChange) {
-            logger.debug("Publishing price change for product ID: {}", priceChange.getProduct().getId());
+            Product product = priceChange.getProduct();
+            logger.debug("Publishing price change for product ID: {} with operation: {}", 
+                product.getId(), product.getOperation() != null ? product.getOperation() : "UNKNOWN");
             priceChangeSink.next(priceChange);
         }
         
@@ -78,7 +81,8 @@ public class WebSocketSubscriptionConfig {
          * @param product The product with low stock
          */
         public void publishLowStockAlert(Product product) {
-            logger.debug("Publishing low stock alert for product ID: {}", product.getId());
+            logger.debug("Publishing low stock alert for product ID: {} with operation: {}", 
+                product.getId(), product.getOperation() != null ? product.getOperation() : "UNKNOWN");
             lowStockSink.next(product);
         }
 

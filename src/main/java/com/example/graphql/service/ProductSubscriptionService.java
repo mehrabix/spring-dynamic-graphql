@@ -41,8 +41,9 @@ public class ProductSubscriptionService {
      * @param newPrice The new price
      */
     public void notifyPriceChanged(Product product, Double oldPrice, Double newPrice) {
-        logger.debug("Product price changed from {} to {} for product: {}", 
-                     oldPrice, newPrice, product.getId());
+        logger.debug("Product price changed from {} to {} for product: {} (operation: {})", 
+                     oldPrice, newPrice, product.getId(), 
+                     product.getOperation() != null ? product.getOperation() : "UNKNOWN");
         
         ProductPriceChange priceChange = new ProductPriceChange(product, oldPrice, newPrice);
         publisher.publishPriceChange(priceChange);

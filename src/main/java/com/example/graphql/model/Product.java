@@ -47,6 +47,10 @@ public class Product implements Serializable {
     @Transient
     private Double previousPrice;
     
+    // Track operation type (not stored in database)
+    @Transient
+    private String operation;
+    
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "product_tags", joinColumns = @JoinColumn(name = "product_id"))
     @Column(name = "tag")
@@ -306,6 +310,14 @@ public class Product implements Serializable {
     
     public void setCustomAttributes(Map<String, String> customAttributes) {
         this.customAttributes = customAttributes;
+    }
+    
+    public String getOperation() {
+        return operation;
+    }
+    
+    public void setOperation(String operation) {
+        this.operation = operation;
     }
     
     @Override

@@ -64,6 +64,7 @@ type Product {
     updatedAt: String
     stockQuantity: Int
     popularity: Int
+    operation: OperationType
 }
 
 # Dynamic object that can return specific requested attributes
@@ -235,4 +236,10 @@ type TopSellingProduct {
     productName: String!
     unitsSold: Int!
     revenue: Float!
+}
+
+enum OperationType {
+    ADDED
+    UPDATED
+    DELETED
 } 

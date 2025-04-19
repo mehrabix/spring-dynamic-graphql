@@ -49,6 +49,9 @@ public class ProductService {
     public Product addProduct(Product product) {
         Product savedProduct = productRepository.save(product);
         
+        // Set operation type
+        savedProduct.setOperation("ADDED");
+        
         // Notify subscribers about the new product
         subscriptionService.handleProductCreated(savedProduct);
         
@@ -91,6 +94,9 @@ public class ProductService {
                     
                     Product updatedProduct = productRepository.save(existingProduct);
                     
+                    // Set operation type
+                    updatedProduct.setOperation("UPDATED");
+                    
                     // Notify subscribers about the update
                     subscriptionService.handleProductUpdate(originalProduct, updatedProduct);
                     
@@ -118,6 +124,9 @@ public class ProductService {
                 updatedProduct.setTags(product.getTags());
                 updatedProduct.setStockQuantity(0); // Set stock to 0 since it's deleted
                 
+                // Set operation type to show this is a deletion
+                updatedProduct.setOperation("DELETED");
+                
                 // Use handleProductUpdate to ensure all subscribers are notified
                 subscriptionService.handleProductUpdate(product, updatedProduct);
                 
@@ -137,6 +146,8 @@ public class ProductService {
         
         // Notify subscribers about each new product
         for (Product product : savedProducts) {
+            // Set operation type
+            product.setOperation("ADDED");
             subscriptionService.handleProductCreated(product);
         }
         
@@ -165,6 +176,9 @@ public class ProductService {
                     updatedProduct.setRating(product.getRating());
                     updatedProduct.setTags(product.getTags());
                     updatedProduct.setStockQuantity(0); // Set stock to 0 since it's deleted
+                    
+                    // Set operation type to show this is a deletion
+                    updatedProduct.setOperation("DELETED");
                     
                     // Use handleProductUpdate to ensure all subscribers are notified
                     subscriptionService.handleProductUpdate(product, updatedProduct);
