@@ -1678,49 +1678,160 @@ These advanced reporting features can be implemented using the existing architec
 - Adding scheduled tasks for report generation
 - Implementing export services for different file formats 
 
-## GraphQL Subscriptions (Planned Feature)
+## GraphQL Subscriptions
 
 The application provides real-time updates through GraphQL Subscriptions over WebSocket. This allows clients to receive immediate notifications when specific events occur on the server.
 
 ### Available Subscriptions
 
-1. **Product Updates** - Receive updates whenever a product is modified:
+1. **Product Updates** - Receive updates whenever a product is modified, added, or deleted:
    ```graphql
-   subscription {
+   subscription ProductUpdated {
      productUpdated {
        id
        name
+       description
        price
        category
+       inStock
+       rating
+       tags
+       createdAt
        updatedAt
+       stockQuantity
+       popularity
+       operation
      }
    }
    ```
 
 2. **Price Change Notifications** - Get notified when product prices change beyond a specified threshold:
    ```graphql
-   subscription {
-     productPriceChanged(minPriceDifference: 5.0) {
-       product {
-         id
-         name
-       }
+   subscription ProductPriceChanged {
+     productPriceChanged(minPriceDifference: null) {
        oldPrice
        newPrice
        percentChange
+       product {
+         id
+         name
+         price
+         category
+         operation
+       }
      }
    }
    ```
 
 3. **Low Stock Alerts** - Monitor inventory levels and receive alerts when products are running low:
    ```graphql
-   subscription {
-     lowStockAlert(threshold: 10) {
+   subscription LowStockAlert {
+     lowStockAlert(threshold: 5) {
        id
        name
        stockQuantity
        category
+       inStock
+       operation
      }
    }
    ```
+
+### Understanding Operation Types
+
+All subscription responses include an `operation` field that indicates what happened to the product:
+
+- **ADDED** - A new product was created
+- **UPDATED** - An existing product was modified
+- **DELETED** - A product was deleted
+
+When a product is deleted, you'll receive a notification with:
+- `operation: "DELETED"`
+- `inStock: false`
+- `stockQuantity: 0`
+
+### Subscription Response Examples
+
+#### Product Added Example:
+
+```json
+{
+  "data": {
+    "productUpdated": {
+      "id": "14",
+      "name": "New Smartphone",
+      "price": 699.99,
+      "category": "Electronics",
+      "inStock": true,
+      "stockQuantity": 25,
+      "operation": "ADDED"
+    }
+  }
+}
+```
+
+#### Product Updated Example:
+
+```json
+{
+  "data": {
+    "productUpdated": {
+      "id": "3",
+      "name": "Premium Laptop",
+      "price": 1299.99,
+      "category": "Electronics",
+      "inStock": true,
+      "stockQuantity": 12,
+      "operation": "UPDATED"
+    }
+  }
+}
+```
+
+#### Product Deleted Example:
+
+```json
+{
+  "data": {
+    "productUpdated": {
+      "id": "13",
+      "name": "Wireless Laser Printer",
+      "price": 249.99,
+      "category": "Office",
+      "inStock": false,
+      "stockQuantity": 0,
+      "operation": "DELETED"
+    }
+  }
+}
+```
+
+### Setting Up Subscriptions
+
+To use GraphQL subscriptions in your client application:
+
+1. **Connect to the WebSocket endpoint**:
+   The WebSocket endpoint is available at: `ws://localhost:8080/graphql`
+
+2. **Set up a subscription client**:
+   Use a GraphQL client that supports subscriptions, such as Apollo Client, urql, or graphql-ws.
+
+3. **Subscribe to the desired events**:
+   Use one of the subscription queries listed above to start receiving real-time updates.
+
+### Subscription Options
+
+#### Price Change Threshold
+
+For the `productPriceChanged` subscription, you can set a minimum price difference threshold:
+
+- Use `minPriceDifference: 5.0` to only receive notifications when the price changes by $5 or more
+- Use `minPriceDifference: null` to receive notifications for any price change
+
+#### Low Stock Threshold
+
+For the `lowStockAlert` subscription, you can set a stock level threshold:
+
+- Use `threshold: 5` (default) to receive alerts when stock drops to 5 or lower
+- Customize the threshold based on your inventory management needs
 
